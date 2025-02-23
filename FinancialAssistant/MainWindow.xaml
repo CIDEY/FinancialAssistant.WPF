@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="FinanceGuard - Authorization"
+    Title="FinancialAssistant - Authorization"
     Width="1000"
     Height="650"
     AllowsTransparency="True"
@@ -118,13 +118,13 @@
                                     FontSize="32"
                                     FontWeight="Bold"
                                     Foreground="White"
-                                    Text="FinanceGuard"
+                                    Text="FinancialAssistant"
                                     TextAlignment="Center" />
                                 <TextBlock
                                     FontSize="18"
                                     Foreground="#EEF2FF"
                                     Opacity="0.9"
-                                    Text="Take control of your finances"
+                                    Text="Контролируйте свои финансы"
                                     TextAlignment="Center" />
                             </StackPanel>
                         </Grid>
@@ -137,29 +137,30 @@
                                 FontSize="32"
                                 FontWeight="Bold"
                                 Foreground="#1F2937"
-                                Text="Welcome Back" />
+                                Text="С возвращением" />
                             <TextBox
                                 Margin="0,0,0,25"
-                                materialDesign:HintAssist.Hint="Email address"
+                                materialDesign:HintAssist.Hint="Адрес электронной почты"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                                 FontSize="16" />
                             <PasswordBox
                                 Margin="0,0,0,35"
-                                materialDesign:HintAssist.Hint="Password"
+                                materialDesign:HintAssist.Hint="Пароль"
                                 FontSize="16" />
                             <Button
                                 Height="50"
                                 Background="#6366F1"
-                                Content="Sign In"
+                                Content="Войти"
                                 Cursor="Hand"
                                 FontSize="16" />
                             <TextBlock Margin="0,10,0,0" HorizontalAlignment="Center">
-                                <Run Text="New to FinanceGuard? " />
+                                <Run Text="Новичок в FinancialAssistant? " />
                                 <Hyperlink
                                     Click="CreateAccount_Click"
                                     FontWeight="SemiBold"
                                     Foreground="#6366F1"
                                     TextDecorations="None">
-                                    Create Account
+                                    Создать аккаунт
                                 </Hyperlink>
                             </TextBlock>
                         </StackPanel>
@@ -175,34 +176,35 @@
                                 FontSize="32"
                                 FontWeight="Bold"
                                 Foreground="#1F2937"
-                                Text="Create Account" />
+                                Text="Создать учетную запись" />
                             <TextBox
                                 Margin="0,0,0,25"
-                                materialDesign:HintAssist.Hint="Full Name"
+                                materialDesign:HintAssist.Hint="Полное имя"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                                 FontSize="16" />
                             <TextBox
                                 Margin="0,0,0,25"
-                                materialDesign:HintAssist.Hint="Email address"
+                                materialDesign:HintAssist.Hint="Адрес электронной почты"
                                 FontSize="16"
                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
                             <PasswordBox
                                 Margin="0,0,0,35"
-                                materialDesign:HintAssist.Hint="Password"
+                                materialDesign:HintAssist.Hint="Пароль"
                                 FontSize="16" />
                             <Button
                                 Height="50"
                                 Background="#6366F1"
-                                Content="Register"
+                                Content="Зарегистрироваться"
                                 Cursor="Hand"
                                 FontSize="16" />
                             <TextBlock Margin="0,10,0,0" HorizontalAlignment="Center">
-                                <Run Text="Already have an account? " />
+                                <Run Text="У вас уже есть аккаунт? " />
                                 <Hyperlink
                                     Click="BackToLogin_Click"
                                     FontWeight="SemiBold"
                                     Foreground="#6366F1"
                                     TextDecorations="None">
-                                    Sign In
+                                    Войти
                                 </Hyperlink>
                             </TextBlock>
                         </StackPanel>
