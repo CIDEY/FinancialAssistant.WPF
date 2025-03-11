@@ -1,0 +1,27 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".txt" #>
+// Нужно к стандартным добавить следующее
+<#@ output extension=".cs" #>
+<#@ assembly name="System.IO" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ assembly name="System.Text.RegularExpressions" #>
+<#
+var directoryPath = @"C:\Users\Булат\source\repos\FinancialAssistant.WPF\FinancialAssistant\Models";
+var files = Directory.GetFiles(directoryPath, "*.cs");
+foreach (var file in files)
+{
+var fileContent = File.ReadAllText(file);
+// Добавление using и JsonIgnore для свойств
+if (!fileContent.StartsWith("using Newtonsoft.Json;"))
+fileContent = "using Newtonsoft.Json;\n" + fileContent;
+fileContent = Regex.Replace(fileContent, @"public\s+virtual\s+(\w+\??)\s+(\w+)\s*\{",
+match => fileContent.Contains($"[JsonIgnore] {match.Value}") ? match.Value : $"[JsonIgnore] {match.Value}");
+File.WriteAllText(file, fileContent);
+}
+#>
