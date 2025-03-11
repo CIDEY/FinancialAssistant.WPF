@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using FinancialAssistant.ViewModels;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
@@ -10,6 +11,20 @@ namespace FinancialAssistant
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new LoginViewModel();
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            var passwordBox = sender as PasswordBox;
+            if (passwordBox != null)
+            {
+                var viewModel = DataContext as LoginViewModel;
+                if (viewModel != null)
+                {
+                    viewModel.Password = passwordBox.Password; // Обновляем свойство Password в ViewModel
+                }
+            }
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

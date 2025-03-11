@@ -5,9 +5,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="clr-namespace:FinancialAssistant.ViewModels"
     Title="FinancialAssistant - Authorization"
     Width="1000"
     Height="650"
+    d:DataContext="{d:DesignInstance Type=viewmodels:LoginViewModel}"
     AllowsTransparency="True"
     Background="Transparent"
     ResizeMode="NoResize"
@@ -140,16 +142,19 @@
                                 Text="С возвращением" />
                             <TextBox
                                 Margin="0,0,0,25"
-                                materialDesign:HintAssist.Hint="Адрес электронной почты"
-                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                                FontSize="16" />
+                                materialDesign:HintAssist.Hint="Логин"
+                                FontSize="16"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" />
                             <PasswordBox
                                 Margin="0,0,0,35"
                                 materialDesign:HintAssist.Hint="Пароль"
-                                FontSize="16" />
+                                FontSize="16"
+                                PasswordChanged="PasswordBox_PasswordChanged" />
                             <Button
                                 Height="50"
                                 Background="#6366F1"
+                                Command="{Binding LoginToCommand}"
                                 Content="Войти"
                                 Cursor="Hand"
                                 FontSize="16" />
@@ -179,21 +184,25 @@
                                 Text="Создать учетную запись" />
                             <TextBox
                                 Margin="0,0,0,25"
-                                materialDesign:HintAssist.Hint="Полное имя"
-                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                                FontSize="16" />
+                                materialDesign:HintAssist.Hint="Логин"
+                                FontSize="16"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox
                                 Margin="0,0,0,25"
                                 materialDesign:HintAssist.Hint="Адрес электронной почты"
                                 FontSize="16"
-                                Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
                             <PasswordBox
                                 Margin="0,0,0,35"
                                 materialDesign:HintAssist.Hint="Пароль"
-                                FontSize="16" />
+                                FontSize="16"
+                                PasswordChanged="PasswordBox_PasswordChanged" />
                             <Button
                                 Height="50"
                                 Background="#6366F1"
+                                Command="{Binding RegisterCommand}"
                                 Content="Зарегистрироваться"
                                 Cursor="Hand"
                                 FontSize="16" />
