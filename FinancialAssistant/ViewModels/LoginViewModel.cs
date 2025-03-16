@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FinancialAssistant.Services;
+using FinancialAssistant.WindowsStart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,9 @@ namespace FinancialAssistant.ViewModels
                 if (isAuthenticated)
                 {
                     MessageBox.Show("Авторизация произошла успешно.");
+
+                    StartWindow startWindow = new StartWindow();
+                    startWindow.Show();
                     // Логика после успешной аутентификации
                     // Например, переход на другой экран или уведомление пользователя
                 }
