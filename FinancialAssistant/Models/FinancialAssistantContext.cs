@@ -1,240 +1,292 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FinancialAssistant.Classes;
+using MaterialDesignThemes.Wpf;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Security.Principal;
+using System.Text;
+using System.Threading.Tasks;
+using System.Transactions;
 
-namespace FinancialAssistant.Models;
-
-public partial class FinancialAssistantContext : DbContext
+namespace FinancialAssistant.Models
 {
-    public FinancialAssistantContext()
+    public partial class FinancialAssistantContext : DbContext
     {
-    }
+        public FinancialAssistantContext()
+        {
+        }
 
-    public FinancialAssistantContext(DbContextOptions<FinancialAssistantContext> options)
-        : base(options)
-    {
-    }
+        public FinancialAssistantContext(DbContextOptions<FinancialAssistantContext> options)
+            : base(options)
+        {
+        }
 
-    public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<Account> Accounts { get; set; }
 
-    public virtual DbSet<Budget> Budgets { get; set; }
+        public virtual DbSet<Budget> Budgets { get; set; }
 
-    public virtual DbSet<Currency> Currencies { get; set; }
+        public virtual DbSet<Currency> Currencies { get; set; }
 
-    public virtual DbSet<Expensecategory> Expensecategories { get; set; }
+        public virtual DbSet<Goal> Goals { get; set; }
 
-    public virtual DbSet<Goal> Goals { get; set; }
+        public virtual DbSet<IncomeCategory> Incomecategories { get; set; }
 
-    public virtual DbSet<Incomecategory> Incomecategories { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
 
-    public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
 
-    public virtual DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=admin;Database=FinancialAssistant");
+            => optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=admin;Database=FinanceDB");
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Account>(entity =>
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder builder)
         {
-            entity.HasKey(e => e.Id).HasName("accounts_pkey");
+            builder.Properties<DateOnly>()
+                   .HaveConversion<DateOnlyConverter>()
+                   .HaveColumnType("date");
 
-            entity.ToTable("accounts");
+            builder.Properties<DateTime>()
+                    .HaveConversion<DateTimeToUtcConverter>()
+                    .HaveColumnType("timestamp with time zone");
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Balance).HasColumnName("balance");
-            entity.Property(e => e.Currencyid).HasColumnName("currencyid");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
-            entity.Property(e => e.Type)
-                .HasMaxLength(255)
-                .HasColumnName("type");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-        });
+        }
 
-        modelBuilder.Entity<Budget>(entity =>
+        public class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
         {
-            entity.HasKey(e => e.Id).HasName("budgets_pkey");
+            public DateOnlyConverter() : base(
+                d => d.ToDateTime(TimeOnly.MinValue),
+                d => DateOnly.FromDateTime(d))
+            { }
+        }
 
-            entity.ToTable("budgets");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Amount).HasColumnName("amount");
-            entity.Property(e => e.Currentprogress).HasColumnName("currentprogress");
-            entity.Property(e => e.Enddate)
-                .HasColumnType("timestamp(6) without time zone")
-                .HasColumnName("enddate");
-            entity.Property(e => e.Expensecategoryid).HasColumnName("expensecategoryid");
-            entity.Property(e => e.Period)
-                .HasMaxLength(255)
-                .HasColumnName("period");
-            entity.Property(e => e.Startdate)
-                .HasColumnType("timestamp(6) without time zone")
-                .HasColumnName("startdate");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-        });
-
-        modelBuilder.Entity<Currency>(entity =>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            entity.HasKey(e => e.Id).HasName("currencies_pkey");
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("accounts_pkey");
+                entity.ToTable("accounts");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Balance).HasColumnName("balance");
+                entity.Property(e => e.CurrencyId).HasColumnName("currencyid");
+                entity.Property(e => e.Name).HasMaxLength(255).HasColumnName("name");
+                entity.Property(e => e.Type).HasMaxLength(255).HasColumnName("type");
+                entity.Property(e => e.UserId).HasColumnName("userid");
 
-            entity.ToTable("currencies");
+                entity.HasOne(a => a.Currency)
+                      .WithMany(c => c.Accounts)
+                      .HasForeignKey(a => a.CurrencyId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasIndex(e => e.Code, "uk5r2dfxl1m7vus47ma0y05sflt").IsUnique();
+                entity.Property(a => a.CreatedAt)
+                    .HasColumnName("created_at")
+                    .HasColumnType("timestamp with time zone")
+                    .HasDefaultValueSql("NOW()"); // Автоматическая установка времени при создании
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Code)
-                .HasMaxLength(255)
-                .HasColumnName("code");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
-            entity.Property(e => e.Rate).HasColumnName("rate");
-            entity.Property(e => e.Symbol)
-                .HasMaxLength(255)
-                .HasColumnName("symbol");
-        });
+                entity.HasOne(a => a.User)
+                      .WithMany(u => u.Accounts)
+                      .HasForeignKey(a => a.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
-        modelBuilder.Entity<Expensecategory>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("expensecategories_pkey");
+            modelBuilder.Entity<UserRole>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
 
-            entity.ToTable("expensecategories");
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(ur => ur.UserId);
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-        });
+            modelBuilder.Entity<UserRole>()
+                .HasOne(ur => ur.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(ur => ur.RoleId);
 
-        modelBuilder.Entity<Goal>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("goals_pkey");
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.Property(t => t.Date)
+                    .HasColumnType("date")
+                    .HasConversion<DateOnlyConverter>();
+            });
 
-            entity.ToTable("goals");
+            modelBuilder.Entity<Budget>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("budgets_pkey");
+                entity.ToTable("budgets");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Amount).HasColumnName("amount");
+                entity.Property(e => e.CurrentProgress).HasColumnName("currentprogress");
+                entity.Property(e => e.EndDate).HasColumnType("timestamp(6) without time zone").HasColumnName("enddate");
+                entity.Property(e => e.Period).HasMaxLength(255).HasColumnName("period");
+                entity.Property(e => e.StartDate).HasColumnType("timestamp(6) without time zone").HasColumnName("startdate");
+                entity.Property(e => e.UserId).HasColumnName("userid");
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Createddate)
-                .HasColumnType("timestamp(6) without time zone")
-                .HasColumnName("createddate");
-            entity.Property(e => e.Currentprogress).HasColumnName("currentprogress");
-            entity.Property(e => e.Deadline)
-                .HasMaxLength(255)
-                .HasColumnName("deadline");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
-            entity.Property(e => e.Targetamount).HasColumnName("targetamount");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-        });
+                entity.HasOne(b => b.User)
+                      .WithMany(u => u.Budgets)
+                      .HasForeignKey(b => b.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Incomecategory>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("incomecategories_pkey");
+            });
 
-            entity.ToTable("incomecategories");
+            modelBuilder.Entity<Currency>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("currencies_pkey");
+                entity.ToTable("currencies");
+                entity.HasIndex(e => e.Code, "uk5r2dfxl1m7vus47ma0y05sflt").IsUnique();
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Code).HasMaxLength(255).HasColumnName("code");
+                entity.Property(e => e.Rate).HasColumnName("rate");
+                entity.Property(e => e.Symbol).HasMaxLength(255).HasColumnName("symbol");
+            });
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-        });
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.Type)
+                .HasConversion<string>();
 
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("roles_pkey");
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.Amount)
+                .HasColumnType("decimal(18,2)"); // Указываем точный тип для БД
 
-            entity.ToTable("roles");
 
-            entity.HasIndex(e => e.Name, "roles_name_key").IsUnique();
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
-        });
+            modelBuilder.Entity<Goal>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("goals_pkey");
+                entity.ToTable("goals");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.CreatedDate)
+                      .HasColumnType("timestamp(6) without time zone")
+                      .HasColumnName("createddate");
+                entity.Property(e => e.CurrentProgress).HasColumnName("currentprogress");
+                entity.Property(e => e.Deadline)
+                      .HasMaxLength(255)
+                      .HasColumnName("deadline");
+                entity.Property(e => e.Description)
+                      .HasMaxLength(255)
+                      .HasColumnName("description");
+                entity.Property(e => e.Name)
+                      .HasMaxLength(255)
+                      .HasColumnName("name");
+                entity.Property(e => e.TargetAmount).HasColumnName("targetamount");
+                entity.Property(e => e.UserId).HasColumnName("userid");
 
-        modelBuilder.Entity<Transaction>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("transactions_pkey");
+                entity.HasOne(g => g.User)
+                      .WithMany(u => u.Goals)
+                      .HasForeignKey(g => g.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
-            entity.ToTable("transactions");
+            modelBuilder.Entity<IncomeCategory>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("incomecategories_pkey");
+                entity.ToTable("incomecategories");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Description).HasMaxLength(255).HasColumnName("description");
+                entity.Property(e => e.Name).HasMaxLength(255).HasColumnName("name");
+                entity.Property(e => e.UserId).HasColumnName("userid");
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.AccountId).HasColumnName("account_id");
-            entity.Property(e => e.Amount).HasColumnName("amount");
-            entity.Property(e => e.Date).HasColumnName("date");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
-            entity.Property(e => e.Expensecategoryid).HasColumnName("expensecategoryid");
-            entity.Property(e => e.Incomecategoryid).HasColumnName("incomecategoryid");
-            entity.Property(e => e.Type)
-                .HasMaxLength(255)
-                .HasColumnName("type");
-        });
+                entity.HasOne(ic => ic.User)
+                      .WithMany(u => u.IncomeCategories)
+                      .HasForeignKey(ic => ic.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("users_pkey");
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Category)
+                .WithMany(c => c.Transactions)
+                .HasForeignKey(t => t.CategoryId);
 
-            entity.ToTable("users");
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Category)
+                .WithMany(c => c.Transactions)
+                .HasForeignKey(t => t.CategoryId);
 
-            entity.HasIndex(e => e.Login, "ukow0gan20590jrb00upg3va2fn").IsUnique();
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("users_pkey");
+                entity.ToTable("users");
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .HasColumnName("email");
-            entity.Property(e => e.Login)
-                .HasMaxLength(255)
-                .HasColumnName("login");
-            entity.Property(e => e.Passwordhash)
-                .HasMaxLength(255)
-                .HasColumnName("passwordhash");
-            entity.Property(e => e.Registrationdate)
-                .HasColumnType("timestamp(6) without time zone")
-                .HasColumnName("registrationdate");
+                entity.HasIndex(e => e.Login, "ukow0gan20590jrb00upg3va2fn").IsUnique();
 
-            entity.HasMany(d => d.Roles).WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "UserRole",
-                    r => r.HasOne<Role>().WithMany()
-                        .HasForeignKey("RoleId")
-                        .HasConstraintName("user_roles_role_id_fkey"),
-                    l => l.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("user_roles_user_id_fkey"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "RoleId").HasName("user_roles_pkey");
-                        j.ToTable("user_roles");
-                        j.IndexerProperty<long>("UserId").HasColumnName("user_id");
-                        j.IndexerProperty<long>("RoleId").HasColumnName("role_id");
-                    });
-        });
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Email)
+                    .HasMaxLength(255)
+                    .HasColumnName("email");
+                entity.Property(e => e.Login)
+                    .HasMaxLength(255)
+                    .HasColumnName("login");
+                entity.Property(e => e.PasswordHash)
+                    .HasMaxLength(255)
+                    .HasColumnName("passwordhash");
+                entity.Property(e => e.RegistrationDate)
+                    .HasColumnType("timestamp(6) without time zone")
+                    .HasColumnName("registrationdate");
 
-        OnModelCreatingPartial(modelBuilder);
+                // Настройка связи через промежуточную сущность
+                entity.HasMany(u => u.UserRoles)
+                    .WithOne(ur => ur.User)
+                    .HasForeignKey(ur => ur.UserId)
+                    .HasConstraintName("user_roles_user_id_fkey");
+
+                entity.Property(u => u.RegistrationDate)
+                    .HasColumnType("timestamp with time zone") // Для PostgreSQL
+                    .HasConversion(
+                        v => v.ToUniversalTime(),
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasKey(r => r.Id).HasName("roles_pkey");
+                entity.ToTable("roles");
+
+                // Настройка свойства Name
+                entity.Property(r => r.Name)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnName("name");
+
+                entity.HasMany(r => r.UserRoles)
+                    .WithOne(ur => ur.Role)
+                    .HasForeignKey(ur => ur.RoleId)
+                    .HasConstraintName("user_roles_role_id_fkey");
+
+                // Добавляем начальные данные
+                entity.HasData(
+                    new Role { Id = 1, Name = "User" },
+                    new Role { Id = 2, Name = "Admin" }
+                );
+            });
+
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.HasKey(ur => new { ur.UserId, ur.RoleId })
+                    .HasName("user_roles_pkey");
+
+                entity.ToTable("user_roles");
+
+                entity.Property(ur => ur.UserId)
+                    .HasColumnName("user_id");
+
+                entity.Property(ur => ur.RoleId)
+                    .HasColumnName("role_id");
+            });
+
+        }
+
+
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

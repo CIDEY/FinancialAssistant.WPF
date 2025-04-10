@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FinancialAssistant.Classes;
 using FinancialAssistant.Services;
 using FinancialAssistant.WindowsStart;
 using System;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using static FinancialAssistant.Services.DBService;
 
 namespace FinancialAssistant.ViewModels
 {
@@ -32,38 +34,30 @@ namespace FinancialAssistant.ViewModels
         [RelayCommand]
         private async Task LoginTo()
         {
-            // Проверяем, что логин и пароль не пустые
-            if (string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(Password))
-            {
-                MessageBox.Show("Логин или пароль пустые.");
-                return;
-            }
-
             try
             {
-                // Асинхронно проверяем аутентификацию
-                bool isAuthenticated = await _dBService.AuthValidation(Login, Password);
+                var userId = await _dBService.AuthValidation(Login, Password);
 
-                if (isAuthenticated)
+                if (userId == null)
                 {
-                    MessageBox.Show("Авторизация произошла успешно.");
-
-                    StartWindow startWindow = new StartWindow();
-                    startWindow.Show();
-                    // Логика после успешной аутентификации
-                    // Например, переход на другой экран или уведомление пользователя
+                    MessageBox.Show("Ошибка авторизации");
+                    return;
                 }
                 else
                 {
-                    MessageBox.Show("Авторизация произошла не удачно.");
-                    // Логика при неудачной аутентификации
-                    // Например, установка сообщения об ошибке
+                    AppContextSession.CurrentUserId = userId.Value;
+
+                    var startWindow = new StartWindow();
+                    startWindow.Show();
+
+                    // Закрываем окно авторизации
+                    Application.Current.Windows.OfType<Window>()
+                        .FirstOrDefault(w => w is MainWindow)?.Close();
                 }
             }
             catch (Exception ex)
             {
-                // Обработка исключений
-                // Например, логирование ошибки или уведомление пользователя
+                MessageBox.Show($"Ошибка: {ex.Message}");
             }
         }
 
@@ -109,7 +103,11 @@ namespace FinancialAssistant.ViewModels
             try
             {
                 // Регистрация пользователя
-                await _dBService.CreateUser(Login, Email, Password);
+                UserRegistrationDto user = new();
+                user.Email = Email;
+                user.Password = Password;
+                user.Login = Login;
+                await _dBService.CreateUser(user);
                 MessageBox.Show("Регистрация прошла успешно.");
                 // Логика после успешной регистрации, например, переход на экран входа
             }

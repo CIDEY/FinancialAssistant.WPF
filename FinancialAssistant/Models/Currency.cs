@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace FinancialAssistant.Models;
-
-public partial class Currency
+namespace FinancialAssistant.Models
 {
-    public long Id { get; set; }
+    public class Currency
+    {
+        public int Id { get; set; }
+        public string Code { get; set; } // Например: USD, EUR
+        public string Symbol { get; set; } // Например: $, €
+        public decimal Rate { get; set; } // Изменяем с double на decimal
 
-    public string Code { get; set; } = null!;
-
-    public string Name { get; set; } = null!;
-
-    public double Rate { get; set; }
-
-    public string Symbol { get; set; } = null!;
+        public ICollection<Account> Accounts { get; set; } = new List<Account>();
+    }
 }

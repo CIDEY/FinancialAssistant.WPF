@@ -14,6 +14,7 @@ namespace FinancialAssistant.Selectors
         public DataTemplate TransactionsTemplate { get; set; }
         public DataTemplate ReportsTemplate { get; set; }
         public DataTemplate SettingsTemplate { get; set; }
+        public DataTemplate LoginTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -26,6 +27,7 @@ namespace FinancialAssistant.Selectors
                 "TransactionsViewModel" => TransactionsTemplate,
                 "ReportsViewModel" => ReportsTemplate,
                 "SettingsViewModel" => SettingsTemplate,
+                
                 _ => base.SelectTemplate(item, container)
             };
         }

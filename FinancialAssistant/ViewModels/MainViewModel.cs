@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FinancialAssistant.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,9 @@ namespace FinancialAssistant.ViewModels
         [ObservableProperty]
         private object _currentPage;
 
-        public MainViewModel()
+        public MainViewModel(long userId)
         {
-            CurrentPage = new HomeViewModel();
+            CurrentPage = new HomeViewModel(AppContextSession.CurrentUserId);
         }
 
         [RelayCommand]
@@ -23,10 +24,10 @@ namespace FinancialAssistant.ViewModels
         {
             CurrentPage = destination switch
             {
-                "HomeView" => new HomeViewModel(),
-                "TransactionsView" => new TransactionsViewModel(),
-                "ReportsView" => new ReportsViewModel(),
-                "SettingsView" => new SettingsViewModel(),
+                "HomeView" => new HomeViewModel(AppContextSession.CurrentUserId),
+                "TransactionsView" => new TransactionsViewModel(/*_currentUserId*/),
+                "ReportsView" => new ReportsViewModel(/*_currentUserId*/),
+                "SettingsView" => new SettingsViewModel(/*_currentUserId*/),
                 _ => CurrentPage
             };
         }

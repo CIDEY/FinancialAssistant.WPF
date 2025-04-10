@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FinancialAssistant.Classes;
+using FinancialAssistant.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +24,8 @@ namespace FinancialAssistant.WindowsStart
         public StartWindow()
         {
             InitializeComponent();
+
+            DataContext = new MainViewModel(AppContextSession.CurrentUserId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using LiveCharts.Wpf;
 using LiveCharts;
 using System;
@@ -8,19 +9,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using FinancialAssistant.Services;
 
 namespace FinancialAssistant.ViewModels
 {
     public partial class HomeViewModel : ObservableObject
     {
-        [ObservableProperty]
-        private decimal _totalBalance = 284_500.75m;
+        private readonly DBService _dbService;
+        private readonly long _userId;
 
         [ObservableProperty]
-        private decimal _monthlyIncome = 128_300.00m;
+        private decimal _totalBalance;
 
         [ObservableProperty]
-        private decimal _monthlyExpense = 93_750.25m;
+        private decimal _monthlyIncome;
+
+        [ObservableProperty]
+        private decimal _monthlyExpense;
 
         [ObservableProperty]
         private string _profitIcon = "ArrowTopRight";
@@ -28,64 +33,57 @@ namespace FinancialAssistant.ViewModels
         [ObservableProperty]
         private Brush _profitColor = (Brush)new BrushConverter().ConvertFrom("#10B981");
 
+        [ObservableProperty]
+        private bool _isLoading;
+
+        [ObservableProperty]
+        private string _errorMessage;
+
         public SeriesCollection SeriesCollection { get; set; }
         public string[] Labels { get; set; }
         public Func<double, string> CurrencyFormatter { get; set; }
-        public Func<double, string> DateFormatter { get; set; }
 
-        public HomeViewModel()
+        public HomeViewModel(long userId)
         {
-            InitializeChart();
-            UpdateProfit();
-            InitializeFormatters();
+            _userId = userId;
+            _dbService = new();
+            LoadDataCommand = new AsyncRelayCommand(LoadDataAsync);
+            LoadDataCommand.ExecuteAsync(null);
         }
 
-        private void InitializeChart()
+        public IAsyncRelayCommand LoadDataCommand { get; }
+
+        private async Task LoadDataAsync()
         {
-            var rnd = new Random();
-            var now = DateTime.Now;
-
-            SeriesCollection = new SeriesCollection
+            try
             {
-                new LineSeries
-                {
-                    Title = "Доходы",
-                    Values = new ChartValues<decimal>(),
-                    Stroke = (Brush)new BrushConverter().ConvertFrom("#10B981"),
-                    Fill = Brushes.Transparent,
-                    PointGeometry = DefaultGeometries.Circle,
-                    PointGeometrySize = 10
-                },
-                new LineSeries
-                {
-                    Title = "Расходы",
-                    Values = new ChartValues<decimal>(),
-                    Stroke = (Brush)new BrushConverter().ConvertFrom("#EF4444"),
-                    Fill = Brushes.Transparent,
-                    PointGeometry = DefaultGeometries.Circle,
-                    PointGeometrySize = 10
-                }
-            };
+                IsLoading = true;
+                ErrorMessage = string.Empty;
 
-            var labelsList = new System.Collections.Generic.List<string>();
+                var summary = await _dbService.GetFinancialSummary(_userId, DateTime.Today);
+                var history = await _dbService.GetYearlyHistory(_userId);
 
-            for (var i = 11; i >= 0; i--)
-            {
-                var date = now.AddMonths(-i);
-                labelsList.Add(date.ToString("MMM yyyy", CultureInfo.CurrentCulture));
-                SeriesCollection[0].Values.Add((decimal)(rnd.Next(80_000, 150_000)));
-                SeriesCollection[1].Values.Add((decimal)(rnd.Next(50_000, 100_000)));
+                TotalBalance = summary.TotalBalance; // Убрано приведение типов
+                MonthlyIncome = summary.MonthlyIncome;
+                MonthlyExpense = summary.MonthlyExpense;
+
+                UpdateProfitIndicator(summary.NetProfit);
+                UpdateChart(history);
             }
-
-            Labels = labelsList.ToArray();
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Ошибка загрузки данных: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
-        private void UpdateProfit()
+        private void UpdateProfitIndicator(decimal netProfit)
         {
-            var profit = MonthlyIncome - MonthlyExpense;
-            NetProfit = $"{profit:N2} ₽";
-
-            if (profit >= 0)
+            NetProfit = $"{netProfit:N2} ₽";
+            if (netProfit >= 0)
             {
                 ProfitIcon = "ArrowTopRight";
                 ProfitColor = (Brush)new BrushConverter().ConvertFrom("#10B981");
@@ -97,11 +95,35 @@ namespace FinancialAssistant.ViewModels
             }
         }
 
-        private void InitializeFormatters()
+        private void UpdateChart(List<DBService.MonthlyHistory> history)
         {
+            SeriesCollection = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Title = "Доходы",
+                    Values = new ChartValues<decimal>(history.Select(h => (decimal)h.Income)),
+                    Stroke = (Brush)new BrushConverter().ConvertFrom("#10B981"),
+                    Fill = Brushes.Transparent,
+                    PointGeometry = DefaultGeometries.Circle,
+                    PointGeometrySize = 10
+                },
+                new LineSeries
+                {
+                    Title = "Расходы",
+                    Values = new ChartValues<decimal>(history.Select(h => (decimal)h.Expense)),
+                    Stroke = (Brush)new BrushConverter().ConvertFrom("#EF4444"),
+                    Fill = Brushes.Transparent,
+                    PointGeometry = DefaultGeometries.Circle,
+                    PointGeometrySize = 10
+                }
+            };
+
+            Labels = history.Select(h =>
+                CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(h.Month))
+                .ToArray();
+
             CurrencyFormatter = value => $"{value:N0} ₽";
-            DateFormatter = value =>
-                new DateTime((long)value).ToString("MMM yyyy", CultureInfo.CurrentCulture);
         }
 
         [ObservableProperty]

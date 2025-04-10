@@ -1,19 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace FinancialAssistant.Models;
-
-public partial class User
+namespace FinancialAssistant.Models
 {
-    public long Id { get; set; }
+    public class User
+    {
+        public long Id { get; set; }
 
-    public string? Email { get; set; }
+        [Required]
+        [MaxLength(255)]
+        public string Login { get; set; }
 
-    public string Login { get; set; } = null!;
+        [Required]
+        [MaxLength(255)]
+        public string Email { get; set; }
+        public string PasswordHash { get; set; } = null!;
+        public DateTime RegistrationDate { get; set; }
 
-    public string Passwordhash { get; set; } = null!;
-
-    public DateTime Registrationdate { get; set; }
-
-    public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+        public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+        public ICollection<Account> Accounts { get; set; } = new List<Account>();
+        public List<UserRole> UserRoles { get; set; } = new();
+        public ICollection<Budget> Budgets { get; set; } = new List<Budget>();
+        public ICollection<Goal> Goals { get; set; } = new List<Goal>();
+        public ICollection<IncomeCategory> IncomeCategories { get; set; } = new List<IncomeCategory>();
+    }
 }

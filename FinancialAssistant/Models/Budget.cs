@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace FinancialAssistant.Models;
-
-public partial class Budget
+namespace FinancialAssistant.Models
 {
-    public long Id { get; set; }
+    public class Budget
+    {
+        public long Id { get; set; }
+        public double Amount { get; set; }
+        public double CurrentProgress { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Period { get; set; } = null!;
+        public DateTime StartDate { get; set; }
+        public long UserId { get; set; }
 
-    public double Amount { get; set; }
-
-    public double Currentprogress { get; set; }
-
-    public DateTime? Enddate { get; set; }
-
-    public int Expensecategoryid { get; set; }
-
-    public string Period { get; set; } = null!;
-
-    public DateTime Startdate { get; set; }
-
-    public long Userid { get; set; }
+        // Навигационные свойства
+        public User User { get; set; }
+    }
 }

@@ -169,10 +169,8 @@
                 </lvc:CartesianChart.DataTooltip>
 
                 <lvc:CartesianChart.AxisX>
-                    <lvc:Axis
-                        Title="Месяцы"
-                        LabelFormatter="{Binding DateFormatter}"
-                        Labels="{Binding Labels}" />
+                    <lvc:Axis Title="Месяцы" Labels="{Binding Labels}" />
+                    <!--  LabelFormatter="{Binding DateFormatter}"  -->
                 </lvc:CartesianChart.AxisX>
 
                 <lvc:CartesianChart.AxisY>

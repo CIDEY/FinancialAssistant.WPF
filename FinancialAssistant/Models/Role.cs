@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace FinancialAssistant.Models;
-
-public partial class Role
+namespace FinancialAssistant.Models
 {
-    public long Id { get; set; }
+    public class Role
+    {
+        public long Id { get; set; }
 
-    public string Name { get; set; } = null!;
+        [Required]
+        [MaxLength(50)]
+        public string Name { get; set; }  // Добавляем отсутствующее свойство
 
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+        public List<UserRole> UserRoles { get; set; } = new();
+    }
 }
