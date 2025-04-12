@@ -65,7 +65,7 @@ namespace FinancialAssistant.ViewModels
                 Balance = 0,
                 Type = "Основной",
                 UserId = _userId,
-                CurrencyId = 1 // Default currency
+                CurrencyId = 0 // Default currency
             };
 
             try

@@ -45,6 +45,9 @@
         <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
             <views:SettingsView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:AccountsViewModel}">
+            <views:AccountsView />
+        </DataTemplate>
 
 
         <!--  Стили для кнопок управления окном  -->

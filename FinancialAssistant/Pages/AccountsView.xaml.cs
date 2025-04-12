@@ -1,5 +1,4 @@
 ﻿using FinancialAssistant.Models;
-using FinancialAssistant.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +19,37 @@ namespace FinancialAssistant.Pages
     /// <summary>
     /// Логика взаимодействия для AccountsView.xaml
     /// </summary>
-    public partial class AccountsView : Page
+    public partial class AccountsView : UserControl
     {
         public AccountsView()
         {
             InitializeComponent();
+        }
+
+        private void ViewAccount_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.DataContext is Account account)
+            {
+                //  TODO: Вызвать команду просмотра счета из ViewModel
+                //  Пример:
+                //  if (DataContext is AccountsViewModel viewModel)
+                //  {
+                //      viewModel.ViewAccountCommand.Execute(account);
+                //  }
+            }
+        }
+
+        private void Transfer_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.DataContext is Account account)
+            {
+                //  TODO: Вызвать команду перевода из ViewModel
+                //  Пример:
+                //  if (DataContext is AccountsViewModel viewModel)
+                //  {
+                //      viewModel.TransferCommand.Execute(account);
+                //  }
+            }
         }
     }
 }
