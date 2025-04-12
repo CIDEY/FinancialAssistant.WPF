@@ -20,6 +20,48 @@ namespace FinancialAssistant.Services
             _context = App.DB;
         }
 
+        public async Task AddAccount(Account account)
+        {
+            await _context.Accounts.AddAsync(account);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAccount(Account account)
+        {
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAccount(long accountId)
+        {
+            var account = await _context.Accounts.FindAsync(accountId);
+            if (account != null)
+            {
+                _context.Accounts.Remove(account);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task AddTransactionAsync(Models.Transaction transaction)
+        {
+            using (var context = new FinancialAssistantContext())
+            {
+                context.Transactions.Add(transaction);
+                await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Account>> GetAccountsAsync(long userId)
+        {
+            using (var context = new FinancialAssistantContext())
+            {
+                return await context.Accounts
+                    .Where(a => a.UserId == userId) // Фильтруем по UserId
+                    .ToListAsync(); // Получаем список аккаунтов
+            }
+        }
+
+
         #region User Management
         public async Task<bool> IsLoginTaken(string login)
         {
@@ -217,26 +259,31 @@ namespace FinancialAssistant.Services
             }
         }
 
-        public async Task<List<MonthlyHistory>> GetYearlyHistory(long userId)
+        public async Task<List<MonthlyHistory>> GetYearlyHistory(long userId, DateTime startDate, DateTime endDate)
         {
-            var startDate = DateOnly.FromDateTime(DateTime.Today.AddYears(-1));
+            var startDateOnly = DateOnly.FromDateTime(startDate);
+            var endDateOnly = DateOnly.FromDateTime(endDate);
 
-            return await _context.Transactions
+            var transactions = await _context.Transactions
                 .Where(t => t.Account.UserId == userId &&
-                           t.Date >= startDate)
+                            t.Date >= startDateOnly && t.Date <= endDateOnly)
+                .ToListAsync();
+
+            // Отладочное сообщение
+            Console.WriteLine($"Найдено транзакций: {transactions.Count}");
+
+            return transactions
                 .GroupBy(t => new { t.Date.Year, t.Date.Month })
                 .Select(g => new MonthlyHistory
                 {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    Income = g.Where(t => t.Type == TransactionType.Income)
-                             .Sum(t => t.Amount),
-                    Expense = g.Where(t => t.Type == TransactionType.Expense)
-                              .Sum(t => t.Amount)
+                    Income = g.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
+                    Expense = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
                 })
                 .OrderBy(h => h.Year)
                 .ThenBy(h => h.Month)
-                .ToListAsync();
+                .ToList();
         }
 
         // Для получения за месяц

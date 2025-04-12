@@ -201,6 +201,21 @@
 
                                     <Button
                                         Command="{Binding NavigateCommand}"
+                                        CommandParameter="AccountsView"
+                                        Style="{StaticResource NavButton}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon
+                                                Width="24"
+                                                Height="24"
+                                                Margin="0,0,10,0"
+                                                VerticalAlignment="Center"
+                                                Kind="CreditCardFast" />
+                                            <TextBlock VerticalAlignment="Center" Text="Счета" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button
+                                        Command="{Binding NavigateCommand}"
                                         CommandParameter="ReportsView"
                                         Style="{StaticResource NavButton}">
                                         <StackPanel Orientation="Horizontal">
@@ -226,6 +241,21 @@
                                                 VerticalAlignment="Center"
                                                 Kind="Cog" />
                                             <TextBlock VerticalAlignment="Center" Text="Настройки" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button
+                                        Command="{Binding NavigateCommand}"
+                                        CommandParameter="ExitView"
+                                        Style="{StaticResource NavButton}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon
+                                                Width="24"
+                                                Height="24"
+                                                Margin="0,0,10,0"
+                                                VerticalAlignment="Center"
+                                                Kind="Logout" />
+                                            <TextBlock VerticalAlignment="Center" Text="Выход" />
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

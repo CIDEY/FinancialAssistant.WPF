@@ -28,6 +28,7 @@ namespace FinancialAssistant.ViewModels
                 "TransactionsView" => new TransactionsViewModel(/*_currentUserId*/),
                 "ReportsView" => new ReportsViewModel(/*_currentUserId*/),
                 "SettingsView" => new SettingsViewModel(/*_currentUserId*/),
+                "AccountsView" => new AccountsViewModel(AppContextSession.CurrentUserId),
                 _ => CurrentPage
             };
         }

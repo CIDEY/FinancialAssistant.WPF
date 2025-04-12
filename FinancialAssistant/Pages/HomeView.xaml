@@ -12,25 +12,40 @@
     d:DesignHeight="600"
     d:DesignWidth="800"
     mc:Ignorable="d">
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  Финансовые показатели  -->
-        <Grid Grid.Row="0" Margin="0,0,0,20">
+        <!--  Выбор диапазона дат  -->
+        <StackPanel
+            Grid.Row="0"
+            Margin="0,0,0,10"
+            Orientation="Horizontal">
+            <TextBlock
+                Margin="0,0,5,0"
+                VerticalAlignment="Center"
+                Text="С:" />
+            <DatePicker Width="120" SelectedDate="{Binding StartDate}" />
+            <TextBlock
+                Margin="10,0,5,0"
+                VerticalAlignment="Center"
+                Text="По:" />
+            <DatePicker Width="120" SelectedDate="{Binding EndDate}" />
+        </StackPanel>
 
+        <!--  Финансовые показатели  -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="10" />
-                <!--  Отступ  -->
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="10" />
-                <!--  Отступ  -->
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="10" />
-                <!--  Отступ  -->
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
@@ -86,6 +101,9 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+
+            <!--  Тестовая кнопка  -->
+            <!--<Button Width="150" Height="40" Margin="10" HorizontalAlignment="Center" Command="{Binding AddRecordCommand}" Content="Добавить запись" />-->
 
             <!--  Расходы  -->
             <Border
@@ -152,9 +170,8 @@
             </Border>
         </Grid>
 
-        <!--  График  -->
         <Border
-            Grid.Row="1"
+            Grid.Row="2"
             Padding="15"
             Background="White"
             CornerRadius="15"
@@ -170,7 +187,6 @@
 
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Title="Месяцы" Labels="{Binding Labels}" />
-                    <!--  LabelFormatter="{Binding DateFormatter}"  -->
                 </lvc:CartesianChart.AxisX>
 
                 <lvc:CartesianChart.AxisY>
