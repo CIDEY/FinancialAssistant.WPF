@@ -1,22 +1,67 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FinancialAssistant.Models;
-using FinancialAssistant.Services;
-using MaterialDesignThemes.Wpf;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using System.Windows;
 using FinancialAssistant.CustomView;
+using FinancialAssistant.Models;
+using FinancialAssistant.Pages;
+using FinancialAssistant.Services;
+using System;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace FinancialAssistant.ViewModels
 {
     public partial class AccountsViewModel : ObservableObject
     {
+        private readonly Func<Account, Task> _onSave;
+
+        [ObservableProperty]
+        private string _name;
+
+        [ObservableProperty]
+        private int _currencyId;
+
+        [ObservableProperty]
+        private string _type;
+
+        public ObservableCollection<Currency> Currencies { get; }
+        public ObservableCollection<string> AccountTypes { get; }
+
+        public AccountsViewModel(Account account, ObservableCollection<Currency> currencies,
+            ObservableCollection<string> accountTypes, Func<Account, Task> onSave)
+        {
+            _onSave = onSave;
+            Name = account.Name;
+            CurrencyId = account.CurrencyId;
+            Type = account.Type;
+            Currencies = currencies;
+            AccountTypes = accountTypes;
+            CurrentAccount = account;
+        }
+
+        public Account CurrentAccount { get; }
+
+        [RelayCommand]
+        private async Task Save()
+        {
+            CurrentAccount.Name = Name;
+            CurrentAccount.CurrencyId = CurrencyId;
+            CurrentAccount.Type = Type;
+            await _onSave?.Invoke(CurrentAccount);
+        }
+
+        [RelayCommand]
+        private void Cancel()
+        {
+            // Ничего не делаем, IsAccountPopupOpen во AccountsView закроет Popup
+            if (Application.Current.MainWindow.FindName("accountsView") is AccountsView accountsView)
+            {
+                accountsView.IsAccountPopupOpen = false;
+            }
+        }
+
         private readonly DBService _dbService;
         private readonly long _userId;
 
@@ -29,22 +74,29 @@ namespace FinancialAssistant.ViewModels
         [ObservableProperty]
         private bool _isAccountSelected;
 
-        public ICommand AddAccountCommand { get; }
-        public ICommand EditAccountCommand { get; }
-        public ICommand DeleteAccountCommand { get; }
+        [ObservableProperty]
+        private bool _isAccountPopupOpen;
+
+        [ObservableProperty]
+        private UserControl _accountPopupContent;
+
+        private ObservableCollection<Currency> _currencies;
+        private ObservableCollection<string> _accountTypes = new ObservableCollection<string> { "Основной", "Сберегательный", "Кредитный" };
 
         public AccountsViewModel(long userId)
         {
             _userId = userId;
             _dbService = new DBService();
-
-            AddAccountCommand = new RelayCommand(AddAccount);
-            EditAccountCommand = new RelayCommand(EditAccount);
-            DeleteAccountCommand = new RelayCommand(DeleteAccount);
-            LoadAccounts();
+            LoadData();
         }
 
-        private async void LoadAccounts()
+        private async Task LoadData()
+        {
+            await LoadAccounts();
+            _currencies = new ObservableCollection<Currency>(await _dbService.GetCurrenciesAsync());
+        }
+
+        private async Task LoadAccounts()
         {
             try
             {
@@ -57,21 +109,31 @@ namespace FinancialAssistant.ViewModels
             }
         }
 
-        private async void AddAccount()
+        [RelayCommand]
+        private void OpenAddAccountPopup()
         {
-            var newAccount = new Account
-            {
-                Name = "Новый счет",
-                Balance = 0,
-                Type = "Основной",
-                UserId = _userId,
-                CurrencyId = 0 // Default currency
-            };
+            var newAccount = new Account { UserId = _userId };
+            var addEditDialog = new EditAccountDialog(newAccount, _currencies, _accountTypes, SaveNewAccount);
+            AccountPopupContent = addEditDialog;
+            IsAccountPopupOpen = true;
+        }
 
+        [RelayCommand]
+        private void OpenEditAccountPopup(Account account)
+        {
+            if (account == null) return;
+            var editDialog = new EditAccountDialog(account, _currencies, _accountTypes, SaveEditedAccount);
+            AccountPopupContent = editDialog;
+            IsAccountPopupOpen = true;
+        }
+
+        private async Task SaveNewAccount(Account account)
+        {
             try
             {
-                await _dbService.AddAccount(newAccount);
-                Accounts.Add(newAccount);
+                await _dbService.AddAccount(account);
+                Accounts.Add(account);
+                IsAccountPopupOpen = false;
             }
             catch (Exception ex)
             {
@@ -79,29 +141,22 @@ namespace FinancialAssistant.ViewModels
             }
         }
 
-        private async void EditAccount()
+        private async Task SaveEditedAccount(Account account)
         {
-            if (SelectedAccount == null) return;
-
-            // Реализация диалога редактирования
-            //var dialog = new EditAccountDialog(SelectedAccount);
-            //var result = await DialogHost.Show(dialog, "RootDialog");
-
-            //if (result is true)
-            //{
-            //    try
-            //    {
-            //        await _dbService.UpdateAccount(SelectedAccount);
-            //        LoadAccounts(); // Обновляем список
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        MessageBox.Show($"Ошибка обновления: {ex.Message}");
-            //    }
-            //}
+            try
+            {
+                await _dbService.UpdateAccount(account);
+                await LoadAccounts(); // Обновляем список
+                IsAccountPopupOpen = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка обновления счета: {ex.Message}");
+            }
         }
 
-        private async void DeleteAccount()
+        [RelayCommand]
+        private async Task DeleteAccount()
         {
             if (SelectedAccount == null ||
                 MessageBox.Show("Удалить этот счет?", "Подтверждение",
@@ -116,6 +171,11 @@ namespace FinancialAssistant.ViewModels
             {
                 MessageBox.Show($"Ошибка удаления: {ex.Message}");
             }
+        }
+
+        partial void OnSelectedAccountChanged(Account value)
+        {
+            IsAccountSelected = value != null;
         }
     }
 }

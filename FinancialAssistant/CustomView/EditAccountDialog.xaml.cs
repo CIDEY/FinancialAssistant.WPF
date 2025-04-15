@@ -1,5 +1,8 @@
-﻿using System;
+﻿using FinancialAssistant.Models;
+using FinancialAssistant.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +23,13 @@ namespace FinancialAssistant.CustomView
     /// </summary>
     public partial class EditAccountDialog : UserControl
     {
-        public EditAccountDialog()
+        public AccountsViewModel ViewModel { get; private set; }
+
+        public EditAccountDialog(Account account, ObservableCollection<Currency> currencies, ObservableCollection<string> accountTypes, Func<Account, Task> onSave)
         {
             InitializeComponent();
+            ViewModel = new AccountsViewModel(account, currencies, accountTypes, onSave);
+            DataContext = ViewModel;
         }
     }
 }

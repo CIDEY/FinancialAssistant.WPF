@@ -1,45 +1,49 @@
-﻿<UserControl x:Class="FinancialAssistant.CustomView.EditAccountDialog"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:FinancialAssistant.CustomView"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" 
-             Width="400">
+﻿<UserControl
+    x:Class="FinancialAssistant.CustomView.EditAccountDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:FinancialAssistant.CustomView"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:FinancialAssistant.CustomView"
+    Width="400"
+    DataContext="{Binding ViewModel}"
+    mc:Ignorable="d">
 
     <StackPanel Margin="10">
         <TextBox
             materialDesign:HintAssist.Hint="Название счета"
             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-            Text="{Binding Name}"/>
+            Text="{Binding Name}" />
 
         <ComboBox
             Margin="0,20"
             materialDesign:HintAssist.Hint="Валюта"
-            ItemsSource="{Binding Currencies}"
             DisplayMemberPath="Code"
-            SelectedValuePath="Id"
-            SelectedValue="{Binding CurrencyId}"/>
+            ItemsSource="{Binding Currencies}"
+            SelectedValue="{Binding CurrencyId}"
+            SelectedValuePath="Id" />
 
         <ComboBox
             materialDesign:HintAssist.Hint="Тип счета"
             ItemsSource="{Binding AccountTypes}"
-            SelectedItem="{Binding Type}"/>
+            SelectedItem="{Binding Type}" />
 
-        <StackPanel Margin="0,20" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel
+            Margin="0,20"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
             <Button
-                Style="{StaticResource MaterialDesignFlatButton}"
+                Command="{Binding CancelCommand}"
                 Content="ОТМЕНА"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="False"/>
+                Style="{StaticResource MaterialDesignFlatButton}" />
 
             <Button
                 Margin="10,0,0,0"
-                Style="{StaticResource MaterialDesignRaisedButton}"
+                Command="{Binding SaveCommand}"
                 Content="СОХРАНИТЬ"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                CommandParameter="True"/>
+                Style="{StaticResource MaterialDesignRaisedButton}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

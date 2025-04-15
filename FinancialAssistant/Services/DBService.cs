@@ -20,6 +20,21 @@ namespace FinancialAssistant.Services
             _context = App.DB;
         }
 
+        public async Task<List<Currency>> GetCurrenciesAsync()
+        {
+            try
+            {
+                // Используем Entity Framework Core для асинхронного получения всех валют из таблицы Currencies
+                return await _context.Currencies.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Обработайте ошибку (логирование, выброс исключения и т.д.)
+                System.Diagnostics.Debug.WriteLine($"Ошибка при получении валют: {ex.Message}");
+                return new List<Currency>(); // Верните пустой список или обработайте ошибку по-другому
+            }
+        }
+
         public async Task AddAccount(Account account)
         {
             await _context.Accounts.AddAsync(account);

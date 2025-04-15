@@ -51,5 +51,16 @@ namespace FinancialAssistant.Pages
                 //  }
             }
         }
+
+        // Добавьте это свойство
+        public bool IsAccountPopupOpen
+        {
+            get { return (bool)GetValue(IsAccountPopupOpenProperty); }
+            set { SetValue(IsAccountPopupOpenProperty, value); }
+        }
+
+        // Используйте DependencyProperty для поддержки привязки данных
+        public static readonly DependencyProperty IsAccountPopupOpenProperty =
+            DependencyProperty.Register("IsAccountPopupOpen", typeof(bool), typeof(AccountsView), new PropertyMetadata(false));
     }
 }

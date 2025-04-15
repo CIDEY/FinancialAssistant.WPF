@@ -267,7 +267,7 @@
                     </Border>
 
                     <!--  Основная область контента  -->
-                    <Border Grid.Column="1" Background="#F9FAFB">
+                    <Border Grid.Column="1" Background="#F9FAFB" x:Name="RootDialog">
                         <ContentControl Margin="20" Content="{Binding CurrentPage}" />
                     </Border>
                 </Grid>
