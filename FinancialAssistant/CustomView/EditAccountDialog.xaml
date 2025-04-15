@@ -35,9 +35,10 @@
             HorizontalAlignment="Right"
             Orientation="Horizontal">
             <Button
-                Command="{Binding CancelCommand}"
+                Click="CancelButton_Click"
                 Content="ОТМЕНА"
                 Style="{StaticResource MaterialDesignFlatButton}" />
+            <!--  Command="{Binding CancelCommand}"  -->
 
             <Button
                 Margin="10,0,0,0"

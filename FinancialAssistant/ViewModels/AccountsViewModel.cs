@@ -113,7 +113,7 @@ namespace FinancialAssistant.ViewModels
         private void OpenAddAccountPopup()
         {
             var newAccount = new Account { UserId = _userId };
-            var addEditDialog = new EditAccountDialog(newAccount, _currencies, _accountTypes, SaveNewAccount);
+            var addEditDialog = new EditAccountDialog(newAccount, _currencies, _accountTypes, SaveNewAccount, this);
             AccountPopupContent = addEditDialog;
             IsAccountPopupOpen = true;
         }
@@ -122,7 +122,7 @@ namespace FinancialAssistant.ViewModels
         private void OpenEditAccountPopup(Account account)
         {
             if (account == null) return;
-            var editDialog = new EditAccountDialog(account, _currencies, _accountTypes, SaveEditedAccount);
+            var editDialog = new EditAccountDialog(account, _currencies, _accountTypes, SaveEditedAccount, this);
             AccountPopupContent = editDialog;
             IsAccountPopupOpen = true;
         }
