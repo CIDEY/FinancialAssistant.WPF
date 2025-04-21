@@ -137,6 +137,15 @@ namespace FinancialAssistant.Services
             }
         }
 
+        //public async Task<List<TransactionCategory>> GetTransactionTypesAsync(long userId)
+        //{
+        //    using (var context = new FinancialAssistantContext())
+        //    {
+        //        return await context.Transactions
+        //            .ToListAsync(); // Получаем список аккаунтов
+        //    }
+        //}
+
 
         #region User Management
         public async Task<bool> IsLoginTaken(string login)

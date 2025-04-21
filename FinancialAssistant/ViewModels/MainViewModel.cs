@@ -39,7 +39,7 @@ namespace FinancialAssistant.ViewModels
             CurrentPage = destination switch
             {
                 "HomeView" => new HomeViewModel(AppContextSession.CurrentUserId),
-                "TransactionsView" => new TransactionsViewModel(/*_currentUserId*/),
+                "TransactionsView" => new TransactionsViewModel(AppContextSession.CurrentUserId),
                 "ReportsView" => new ReportsViewModel(/*_currentUserId*/),
                 "SettingsView" => new SettingsViewModel(/*_currentUserId*/),
                 "AccountsView" => new AccountsViewModel(AppContextSession.CurrentUserId),

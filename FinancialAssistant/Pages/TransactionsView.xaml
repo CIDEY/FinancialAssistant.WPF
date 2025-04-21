@@ -2,14 +2,50 @@
     x:Class="FinancialAssistant.Pages.TransactionsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:FinancialAssistant.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:FinancialAssistant.Pages"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:FinancialAssistant.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:TransactionsViewModel}"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    Background="#F9FAFB"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:TransactionTypeToBrushConverter x:Key="TransactionTypeToBrushConverter" />
+        <converters:TransactionTypeToIconConverter x:Key="TransactionTypeToIconConverter" />
+        <Style x:Key="MaterialDesignToolBarButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarButtonBackground}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarButtonPressedBackground}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
 
     <Grid Margin="20">
         <StackPanel>
@@ -25,75 +61,104 @@
             <Border
                 Padding="15"
                 Background="White"
-                CornerRadius="10">
-                <ListView BorderThickness="0" ItemsSource="{Binding Transactions}">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Width="150" Header="Дата">
-                                <GridViewColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock FontWeight="SemiBold" Text="Дата" />
-                                    </DataTemplate>
-                                </GridViewColumn.HeaderTemplate>
-                                <GridViewColumn.DisplayMemberBinding>
-                                    <Binding Path="Date" StringFormat="{}{0:dd.MM.yyyy}" />
-                                </GridViewColumn.DisplayMemberBinding>
-                            </GridViewColumn>
+                CornerRadius="15"
+                Effect="{StaticResource MaterialDesignShadowDepth2}">
+                <ListView
+                    BorderThickness="0"
+                    ItemsSource="{Binding TransactionList}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    SelectedItem="{Binding SelectedTransaction}"
+                    Style="{StaticResource MaterialDesignListView}">
 
-                            <GridViewColumn Width="120" Header="Сумма">
-                                <GridViewColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock FontWeight="SemiBold" Text="Сумма" />
-                                    </DataTemplate>
-                                </GridViewColumn.HeaderTemplate>
-                                <GridViewColumn.DisplayMemberBinding>
-                                    <Binding Path="Amount" StringFormat="{}{0:N2} ₽" />
-                                </GridViewColumn.DisplayMemberBinding>
-                            </GridViewColumn>
-
-                            <GridViewColumn Width="200" Header="Категория">
-                                <GridViewColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock FontWeight="SemiBold" Text="Категория" />
-                                    </DataTemplate>
-                                </GridViewColumn.HeaderTemplate>
-                                <GridViewColumn.DisplayMemberBinding>
-                                    <Binding Path="Category" />
-                                </GridViewColumn.DisplayMemberBinding>
-                            </GridViewColumn>
-
-                            <GridViewColumn Width="300" Header="Описание">
-                                <GridViewColumn.HeaderTemplate>
-                                    <DataTemplate>
-                                        <TextBlock FontWeight="SemiBold" Text="Описание" />
-                                    </DataTemplate>
-                                </GridViewColumn.HeaderTemplate>
-                                <GridViewColumn.DisplayMemberBinding>
-                                    <Binding Path="Description" />
-                                </GridViewColumn.DisplayMemberBinding>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-
-                    <!--  Стиль для элементов списка  -->
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Padding" Value="10" />
-                            <Setter Property="BorderThickness" Value="0,0,0,1" />
-                            <Setter Property="BorderBrush" Value="#E5E7EB" />
+                            <Setter Property="Padding" Value="0,4" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListViewItem">
+                                        <ContentPresenter />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </ListView.ItemContainerStyle>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="0,4"
+                                Padding="16"
+                                materialDesign:TransitionAssist.DisableTransitions="True"
+                                Background="White"
+                                CornerRadius="8"
+                                Effect="{StaticResource MaterialDesignShadowDepth1}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!--  Иконка типа транзакции  -->
+                                    <materialDesign:PackIcon
+                                        Grid.Column="0"
+                                        Width="32"
+                                        Height="32"
+                                        Margin="0,0,16,0"
+                                        Foreground="{Binding Type, Converter={StaticResource TransactionTypeToBrushConverter}}"
+                                        Kind="{Binding Type, Converter={StaticResource TransactionTypeToIconConverter}}" />
+
+                                    <!--  Основная информация  -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="16"
+                                            FontWeight="SemiBold"
+                                            Foreground="#1F2937"
+                                            Text="{Binding Category.Name}" />
+
+                                        <TextBlock
+                                            Margin="0,4,0,0"
+                                            FontSize="14"
+                                            Foreground="#6B7280"
+                                            Text="{Binding Description}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+
+                                    <!--  Сумма и дата  -->
+                                    <StackPanel
+                                        Grid.Column="2"
+                                        Margin="16,0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Foreground="{Binding Type, Converter={StaticResource TransactionTypeToBrushConverter}}"
+                                            Text="{Binding Amount, StringFormat={}{0:N2} ₽}" />
+
+                                        <TextBlock
+                                            Margin="0,4,0,0"
+                                            FontSize="12"
+                                            Foreground="#6B7280"
+                                            Text="{Binding Date, StringFormat={}{0:dd MMM yyyy}}" />
+                                    </StackPanel>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
                 </ListView>
             </Border>
 
             <!--  Кнопка добавления  -->
             <Button
                 Height="50"
-                Margin="0 10 0 0"
+                Margin="0,10,0,0"
                 HorizontalAlignment="Left"
                 Background="#6366F1"
-                Command="{Binding AddTransactionCommand}"
+                Command="{Binding AddTransactionPopupCommand}"
                 Cursor="Hand"
                 Foreground="White"
                 Style="{StaticResource MaterialDesignRaisedButton}">
@@ -114,5 +179,22 @@
                 </Button.Content>
             </Button>
         </StackPanel>
+
+        <Popup
+            x:Name="transactionPopup"
+            IsOpen="{Binding IsAddTransactionPopupOpen, Mode=TwoWay}"
+            Placement="Center"
+            StaysOpen="False">
+            <Border
+                Padding="16"
+                Background="White"
+                BorderBrush="{StaticResource MaterialDesignDivider}"
+                BorderThickness="1"
+                CornerRadius="5">
+                <ContentPresenter Content="{Binding AddTransactionPopupContent}" />
+            </Border>
+        </Popup>
+
+
     </Grid>
 </UserControl>
