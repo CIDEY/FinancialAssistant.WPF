@@ -54,7 +54,7 @@ namespace FinancialAssistant.ViewModels
             IsAddTransactionPopupOpen = true;
         }
 
-        private async Task LoadTransaction()
+        public async Task LoadTransaction()
         {
             try
             {
