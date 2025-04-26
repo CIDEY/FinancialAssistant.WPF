@@ -21,7 +21,7 @@ namespace FinancialAssistant.Services
 
         public DBService()
         {
-            _context = App.DB;
+            _context = new FinancialAssistantContext();
         }
 
         public Currency GetCurrencyByCode(string currencyCode)
@@ -106,6 +106,15 @@ namespace FinancialAssistant.Services
         {
             _context.Accounts.Update(account);
             await _context.SaveChangesAsync();
+
+            var existing = await _context.Accounts
+                .FirstOrDefaultAsync(a => a.Id == account.Id);
+
+            if (existing != null)
+            {
+                _context.Entry(existing).CurrentValues.SetValues(account);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteAccount(long accountId)
@@ -129,12 +138,17 @@ namespace FinancialAssistant.Services
 
         public async Task<List<Account>> GetAccountsAsync(long userId)
         {
-            using (var context = new FinancialAssistantContext())
-            {
-                return await context.Accounts
-                    .Where(a => a.UserId == userId) // Фильтруем по UserId
-                    .ToListAsync(); // Получаем список аккаунтов
-            }
+            return await _context.Accounts
+                .AsNoTracking() // Важно для чтения без отслеживания
+                .Where(a => a.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<Account> GetAccountByIdAsync(long idAccount)
+        {
+            // Уберите using, так как контекст должен быть общим для всех операций
+            return await _context.Accounts
+                .FirstOrDefaultAsync(a => a.Id == idAccount);
         }
 
         //public async Task<List<TransactionCategory>> GetTransactionTypesAsync(long userId)
@@ -485,7 +499,7 @@ namespace FinancialAssistant.Services
 
         public void Dispose()
         {
-            _context.Dispose();
+            _context?.Dispose();
         }
     }
 }

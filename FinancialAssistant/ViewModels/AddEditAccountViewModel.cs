@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FinancialAssistant.Classes;
 using FinancialAssistant.Models;
 using FinancialAssistant.Services;
 using System;
@@ -41,6 +42,8 @@ namespace FinancialAssistant.ViewModels
         
         public AddEditAccountViewModel(AccountsViewModel accountsViewModel, bool isEdit, Account selectedAccount)
         {
+            _dbService = new();
+
             ViewModel = accountsViewModel;
             IsEdit = selectedAccount != null ? true : false;
 
@@ -58,7 +61,6 @@ namespace FinancialAssistant.ViewModels
                 Name = selectedAccount.Name;
                 CurrencyId = selectedAccount.CurrencyId;
                 Type = selectedAccount.Type;
-                //CreatedAt
             }
         }
 
@@ -69,7 +71,7 @@ namespace FinancialAssistant.ViewModels
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.IsAccountPopupOpen = false; // Устанавливаем результат диалога как "false"
+            ViewModel.IsAccountPopupOpen = false;
         }
 
         [RelayCommand]
@@ -78,46 +80,45 @@ namespace FinancialAssistant.ViewModels
             ViewModel.IsAccountPopupOpen = false;
         }
 
-        //CurrentAccount.Name = Name;
-        //    CurrentAccount.CurrencyId = CurrencyId;
-        //    CurrentAccount.Type = Type;
-
         [RelayCommand]
         private async Task Save()
         {
-            if (IsEdit)
-                await SaveEditedAccount(SelectedAccount, ViewModel);
-            else
-                await SaveNewAccount(SelectedAccount, ViewModel);
-        }
-
-        //[RelayCommand]
-        private async Task SaveNewAccount(Account account, AccountsViewModel accountsViewModel)
-        {
             try
             {
-                await _dbService.AddAccount(account);
-                accountsViewModel.Accounts.Add(account);
-                accountsViewModel.IsAccountPopupOpen = false;
+                if (IsEdit)
+                {
+                    // Получаем отслеживаемую сущность из контекста
+                    var existingAccount = await _dbService.GetAccountByIdAsync(SelectedAccount.Id);
+
+                    // Обновляем свойства
+                    existingAccount.Name = Name;
+                    existingAccount.CurrencyId = CurrencyId;
+                    existingAccount.Type = Type;
+
+                    await _dbService.UpdateAccount(existingAccount);
+                    await ViewModel.LoadAccounts();
+                }
+                else
+                {
+                    Account account = new()
+                    {
+                        Name = Name,
+                        CurrencyId = CurrencyId,
+                        Type = Type,
+                        CreatedAt = DateTime.Now,
+                        UserId = AppContextSession.CurrentUserId,
+                        Balance = 0
+                    };
+
+                    await _dbService.AddAccount(account);
+                    ViewModel.Accounts.Add(account);
+                }
+
+                ViewModel.IsAccountPopupOpen = false;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка создания счета: {ex.Message}");
-            }
-        }
-
-        //[RelayCommand]
-        private async Task SaveEditedAccount(Account account, AccountsViewModel accountsViewModel)
-        {
-            try
-            {
-                await _dbService.UpdateAccount(account);
-                await accountsViewModel.LoadAccounts(); // Обновляем список
-                accountsViewModel.IsAccountPopupOpen = false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка обновления счета: {ex.Message}");
             }
         }
     }

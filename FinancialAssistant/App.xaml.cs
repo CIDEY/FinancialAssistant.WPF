@@ -10,7 +10,6 @@ namespace FinancialAssistant
     /// </summary>
     public partial class App : Application
     {
-        public static FinancialAssistantContext DB = new FinancialAssistantContext();
     }
 
 }
