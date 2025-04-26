@@ -8,6 +8,7 @@
     xmlns:vm="clr-namespace:FinancialAssistant.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:AddTransactionDialogViewModel}"
     d:DesignHeight="550"
+    Background="Transparent"
     d:DesignWidth="800"
     mc:Ignorable="d">
 

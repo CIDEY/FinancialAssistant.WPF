@@ -13,8 +13,8 @@ namespace FinancialAssistant.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is TransactionType type
-                ? type == TransactionType.Income
+            return value is long type
+                ? type == 1
                     ? PackIconKind.ArrowTopBold
                     : PackIconKind.ArrowBottomBold
                 : PackIconKind.HelpCircle;

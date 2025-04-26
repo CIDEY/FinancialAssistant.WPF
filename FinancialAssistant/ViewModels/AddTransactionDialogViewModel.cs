@@ -64,11 +64,17 @@ namespace FinancialAssistant.ViewModels
         private async Task Save()
         {
             int selectedCategory;
-
+            TransactionType transactionType;
             if (SelectedTransactionTypes == "Снятие")
+            {
                 selectedCategory = 0;
+                transactionType = TransactionType.Expense;
+            }
             else
+            {
                 selectedCategory = 1;
+                transactionType = TransactionType.Income;
+            }
 
             Transaction transaction = new()
             {
@@ -76,7 +82,8 @@ namespace FinancialAssistant.ViewModels
                 Amount = Amount,
                 Date = DateOnly.FromDateTime(SelectedDate),
                 Description = DescriptionText,
-                CategoryId = selectedCategory
+                CategoryId = selectedCategory,
+                Type = transactionType
             };
 
             await _dbService.AddTransactionAsync(transaction);
