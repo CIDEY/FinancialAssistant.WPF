@@ -28,15 +28,17 @@ namespace FinancialAssistant.CustomView
         public AccountsViewModel ViewModel { get; private set; }
         public AccountsViewModel ViewModelPopup { get; private set; }
 
-        public EditAccountDialog(Account account, ObservableCollection<Currency> currencies, 
-            ObservableCollection<string> accountTypes, Func<Account, Task> onSave,
-            AccountsViewModel accountsViewModel)
+        public EditAccountDialog(
+            //Account account, ObservableCollection<Currency> currencies, 
+            //ObservableCollection<string> accountTypes, Func<Account, Task> onSave,
+            //AccountsViewModel accountsViewModel
+            )
         {
             InitializeComponent();
-            ViewModel = new AccountsViewModel(account, currencies, accountTypes, onSave);
-            ViewModelPopup = accountsViewModel;
-            DataContext = ViewModel;
-            _dbService = new();
+            //ViewModel = new AccountsViewModel(account, currencies, accountTypes, onSave);
+            //ViewModelPopup = accountsViewModel;
+            //DataContext = ViewModel;
+            //_dbService = new();
 
         }
 

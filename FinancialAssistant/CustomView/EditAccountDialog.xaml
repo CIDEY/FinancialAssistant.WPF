@@ -6,9 +6,9 @@
     xmlns:local="clr-namespace:FinancialAssistant.CustomView"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:FinancialAssistant.CustomView"
+    xmlns:vm="clr-namespace:FinancialAssistant.ViewModels"
     Width="400"
-    DataContext="{Binding ViewModel}"
+    d:DataContext="{d:DesignInstance Type=vm:AddEditAccountViewModel}"
     mc:Ignorable="d">
 
     <StackPanel Margin="10">
@@ -35,10 +35,9 @@
             HorizontalAlignment="Right"
             Orientation="Horizontal">
             <Button
-                Click="CancelButton_Click"
+                Command="{Binding CancelCommand}"
                 Content="ОТМЕНА"
                 Style="{StaticResource MaterialDesignFlatButton}" />
-            <!--  Command="{Binding CancelCommand}"  -->
 
             <Button
                 Margin="10,0,0,0"
