@@ -52,9 +52,9 @@ namespace FinancialAssistant.ViewModels
         {
             _userId = userId;
             _dbService = new DBService();
-            LoadData();
         }
 
+        [RelayCommand]
         private async Task LoadData()
         {
             await LoadAccounts();
