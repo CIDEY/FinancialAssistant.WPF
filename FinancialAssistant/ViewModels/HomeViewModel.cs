@@ -200,26 +200,26 @@ namespace FinancialAssistant.ViewModels
             }
 
             SeriesCollection = new SeriesCollection
-    {
-        new LineSeries
-        {
-            Title = "Доходы",
-            Values = new ChartValues<decimal>(allMonths.Select(h => h.Income)),
-            Stroke = (Brush)new BrushConverter().ConvertFrom("#10B981"),
-            Fill = Brushes.Transparent,
-            PointGeometry = DefaultGeometries.Circle,
-            PointGeometrySize = 10
-        },
-        new LineSeries
-        {
-            Title = "Расходы",
-            Values = new ChartValues<decimal>(allMonths.Select(h => h.Expense)),
-            Stroke = (Brush)new BrushConverter().ConvertFrom("#EF4444"),
-            Fill = Brushes.Transparent,
-            PointGeometry = DefaultGeometries.Circle,
-            PointGeometrySize = 10
-        }
-    };
+            {
+                new LineSeries
+                {
+                    Title = "Доходы",
+                    Values = new ChartValues<decimal>(allMonths.Select(h => h.Income)),
+                    Stroke = (Brush)new BrushConverter().ConvertFrom("#10B981"),
+                    Fill = Brushes.Transparent,
+                    PointGeometry = DefaultGeometries.Circle,
+                    PointGeometrySize = 10
+                },
+                new LineSeries
+                {
+                    Title = "Расходы",
+                    Values = new ChartValues<decimal>(allMonths.Select(h => h.Expense)),
+                    Stroke = (Brush)new BrushConverter().ConvertFrom("#EF4444"),
+                    Fill = Brushes.Transparent,
+                    PointGeometry = DefaultGeometries.Circle,
+                    PointGeometrySize = 10
+                }
+            };
 
             Labels = allMonths.Select(h => $"{CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(h.Month)} {h.Year}").ToArray();
             CurrencyFormatter = value => value.ToString("N0", CultureInfo.CurrentCulture) + " ₽";

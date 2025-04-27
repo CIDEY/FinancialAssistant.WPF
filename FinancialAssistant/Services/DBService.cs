@@ -45,7 +45,7 @@ namespace FinancialAssistant.Services
                         {
                             Code = currency.Key,
                             Symbol = currency.Value.CharCode, // Здесь можно использовать CharCode или другое поле для символа
-                            Rate = currency.Value.Value
+                            Rate = currency.Value.Value / currency.Value.Nominal
                         };
 
                         // Сохраняем или обновляем курс в базе данных
@@ -129,16 +129,55 @@ namespace FinancialAssistant.Services
 
         public async Task AddTransactionAsync(Models.Transaction transaction)
         {
-            using (var context = new FinancialAssistantContext())
+            //using (var context = new FinancialAssistantContext())
+            //{
+            //    context.Transactions.Add(transaction);
+            //    await context.SaveChangesAsync();
+            //}
+
+            using (var transactionScope = await _context.Database.BeginTransactionAsync())
             {
-                context.Transactions.Add(transaction);
-                await context.SaveChangesAsync();
+                try
+                {
+                    // Add the transaction to the database
+                    await _context.Transactions.AddAsync(transaction);
+
+                    // Retrieve the account associated with the transaction
+                    var account = await _context.Accounts
+                        .FirstOrDefaultAsync(a => a.Id == transaction.AccountId);
+
+                    if (account != null)
+                    {
+                        // Update the account balance based on the transaction type
+                        if (transaction.Type == TransactionType.Income)
+                        {
+                            account.Balance += transaction.Amount; // Increase balance for income
+                        }
+                        else if (transaction.Type == TransactionType.Expense)
+                        {
+                            account.Balance -= transaction.Amount; // Decrease balance for expense
+                        }
+
+                        // Save the updated account balance
+                        _context.Accounts.Update(account);
+                    }
+
+                    // Save all changes to the database
+                    await _context.SaveChangesAsync();
+                    await transactionScope.CommitAsync();
+                }
+                catch
+                {
+                    await transactionScope.RollbackAsync();
+                    throw; // Rethrow the exception to handle it further up the call stack
+                }
             }
         }
 
         public async Task<List<Account>> GetAccountsAsync(long userId)
         {
             return await _context.Accounts
+                .Include(a => a.Currency) // Загрузка связанных данных о валюте
                 .AsNoTracking() // Важно для чтения без отслеживания
                 .Where(a => a.UserId == userId)
                 .ToListAsync();
@@ -150,16 +189,6 @@ namespace FinancialAssistant.Services
             return await _context.Accounts
                 .FirstOrDefaultAsync(a => a.Id == idAccount);
         }
-
-        //public async Task<List<TransactionCategory>> GetTransactionTypesAsync(long userId)
-        //{
-        //    using (var context = new FinancialAssistantContext())
-        //    {
-        //        return await context.Transactions
-        //            .ToListAsync(); // Получаем список аккаунтов
-        //    }
-        //}
-
 
         #region User Management
         public async Task<bool> IsLoginTaken(string login)
@@ -400,12 +429,34 @@ namespace FinancialAssistant.Services
             return await GetTransactionsForMonth(userId, today.Year, today.Month);
         }
 
+        public async Task<List<Models.Transaction>> GetTransactionsByAccountIdAsync(long accountId)
+        {
+            try
+            {
+                return await _context.Transactions
+                    .Where(t => t.AccountId == accountId)
+                    .Include(t => t.Category)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ошибка получения транзакций: {ex.Message}");
+            }
+        }
+
         public async Task<List<Models.Transaction>> GetTransactionsByPeriod(long userId, DateTime startDate, DateTime endDate)
         {
             return await GetTransactionsByPeriod(
                 userId,
                 DateOnly.FromDateTime(startDate),
                 DateOnly.FromDateTime(endDate));
+        }
+
+        public List<Models.Transaction> GetTransactionsByPeriod(long userId, long accountId)
+        {
+            return _context.Transactions
+                .Where(t => t.Account.UserId == userId && t.AccountId == accountId)
+                .ToList();
         }
 
 

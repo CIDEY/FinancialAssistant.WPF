@@ -118,7 +118,7 @@
                                             Margin="0,2,0,0"
                                             FontSize="12"
                                             Foreground="#717171"
-                                            Text="{Binding Currency.Code}" />
+                                            Text="{Binding Currency.Symbol}" />
                                     </StackPanel>
 
                                     <TextBlock
@@ -155,6 +155,17 @@
                                             Height="24"
                                             Foreground="#FF5252"
                                             Kind="TrashCanOutline" />
+                                    </Button>
+                                    <Button
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType=ListView}, Path=DataContext.ExportToExcelCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignToolBarButton}"
+                                        ToolTip="Экспорт в Excel">
+                                        <materialDesign:PackIcon
+                                            Width="24"
+                                            Height="24"
+                                            Foreground="#1D6F42"
+                                            Kind="MicrosoftExcel" />
                                     </Button>
                                 </StackPanel>
                             </Grid>

@@ -65,15 +65,18 @@ namespace FinancialAssistant.ViewModels
         {
             int selectedCategory;
             TransactionType transactionType;
+
             if (SelectedTransactionTypes == "Снятие")
             {
                 selectedCategory = 0;
                 transactionType = TransactionType.Expense;
+                //Здесь сделать метод который снимет со счета по SelectedAccount.Id из таблицы Accounts
             }
             else
             {
                 selectedCategory = 1;
                 transactionType = TransactionType.Income;
+                //Здесь сделать метод который пополнит счет по SelectedAccount.Id из таблицы Accounts
             }
 
             Transaction transaction = new()
@@ -89,6 +92,7 @@ namespace FinancialAssistant.ViewModels
             await _dbService.AddTransactionAsync(transaction);
 
             await ViewModelPopup.LoadTransaction();
+            ViewModelPopup.IsAddTransactionPopupOpen = false;
         }
     }
 }
