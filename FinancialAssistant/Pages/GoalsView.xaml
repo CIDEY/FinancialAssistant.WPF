@@ -1,0 +1,180 @@
+﻿<UserControl
+    x:Class="FinancialAssistant.Pages.GoalsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:FinancialAssistant.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:FinancialAssistant.Pages"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:FinancialAssistant.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:GoalsViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background="#F9FAFB"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!--  Добавляем недостающий стиль  -->
+        <Style x:Key="MaterialDesignToolBarButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarButtonBackground}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarButtonPressedBackground}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  Добавляем конвертер  -->
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <StackPanel
+            Grid.Row="0"
+            Margin="0,0,0,20"
+            Orientation="Horizontal">
+            <Button
+                Command="{Binding OpenAddGoalPopupCommand}"
+                Content="Добавить цель"
+                Style="{StaticResource MaterialDesignRaisedButton}" />
+        </StackPanel>
+
+        <!--  Goals List  -->
+        <Border
+            Grid.Row="1"
+            Padding="15"
+            Background="White"
+            CornerRadius="15"
+            Effect="{StaticResource MaterialDesignShadowDepth2}">
+            <ListView
+                BorderThickness="0"
+                ItemsSource="{Binding Goals}"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                SelectedItem="{Binding SelectedGoal}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0,8" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border
+                            Padding="16"
+                            materialDesign:ElevationAssist.Elevation="Dp2"
+                            Background="White"
+                            CornerRadius="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!--  Goal Info  -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        Text="{Binding Name}" />
+
+                                    <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+                                        <TextBlock
+                                            FontSize="14"
+                                            Foreground="#717171"
+                                            Text="{Binding CurrentProgress, StringFormat=N2}" />
+                                        <TextBlock
+                                            Margin="4,0,0,0"
+                                            FontSize="14"
+                                            Foreground="#717171"
+                                            Text="{Binding TargetAmount, StringFormat='из {0:N2}'}" />
+                                    </StackPanel>
+
+                                    <ProgressBar
+                                        Height="8"
+                                        Margin="0,8,0,0"
+                                        Foreground="#4F46E5"
+                                        Maximum="100"
+                                        Style="{StaticResource MaterialDesignLinearProgressBar}"
+                                        Value="{Binding Progress}" />
+
+                                    <TextBlock
+                                        Margin="0,4,0,0"
+                                        FontSize="12"
+                                        Foreground="#717171"
+                                        Text="{Binding Deadline, StringFormat='До {0:dd MMMM yyyy}'}" />
+                                </StackPanel>
+
+                                <!--  Actions  -->
+                                <StackPanel
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal">
+                                    <Button
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType=ListView}, Path=DataContext.DeleteGoalCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MaterialDesignToolBarButton}"
+                                        ToolTip="Удалить">
+                                        <materialDesign:PackIcon
+                                            Width="24"
+                                            Height="24"
+                                            Foreground="#FF5252"
+                                            Kind="TrashCanOutline" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+
+        <!--  Popup  -->
+        <Rectangle
+            Grid.RowSpan="2"
+            Fill="#33000000"
+            Visibility="{Binding IsGoalPopupOpen, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+        <Popup
+            IsOpen="{Binding IsGoalPopupOpen}"
+            Placement="Center"
+            StaysOpen="False">
+            <Border
+                Width="400"
+                Padding="24"
+                Background="White"
+                CornerRadius="8"
+                Effect="{StaticResource MaterialDesignShadowDepth4}">
+                <ContentControl Content="{Binding GoalPopupContent}" />
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

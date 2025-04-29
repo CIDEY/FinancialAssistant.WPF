@@ -39,8 +39,8 @@
         <DataTemplate DataType="{x:Type viewModels:TransactionsViewModel}">
             <views:TransactionsView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type viewModels:ReportsViewModel}">
-            <views:ReportsView />
+        <DataTemplate DataType="{x:Type viewModels:GoalsViewModel}">
+            <views:GoalsView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
             <views:SettingsView />
@@ -219,6 +219,21 @@
 
                                     <Button
                                         Command="{Binding NavigateCommand}"
+                                        CommandParameter="GoalsView"
+                                        Style="{StaticResource NavButton}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon
+                                                Width="24"
+                                                Height="24"
+                                                Margin="0,0,10,0"
+                                                VerticalAlignment="Center"
+                                                Kind="Goal" />
+                                            <TextBlock VerticalAlignment="Center" Text="Цели" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!--<Button
+                                        Command="{Binding NavigateCommand}"
                                         CommandParameter="ReportsView"
                                         Style="{StaticResource NavButton}">
                                         <StackPanel Orientation="Horizontal">
@@ -230,7 +245,7 @@
                                                 Kind="ChartAreaspline" />
                                             <TextBlock VerticalAlignment="Center" Text="Отчеты" />
                                         </StackPanel>
-                                    </Button>
+                                    </Button>-->
 
                                     <Button
                                         Command="{Binding NavigateCommand}"
@@ -248,6 +263,7 @@
                                     </Button>
 
                                     <Button
+                                        Click="Exit_Btn"
                                         Command="{Binding NavigateCommand}"
                                         CommandParameter="ExitView"
                                         Style="{StaticResource NavButton}">
@@ -267,7 +283,10 @@
                     </Border>
 
                     <!--  Основная область контента  -->
-                    <Border Grid.Column="1" Background="#F9FAFB" x:Name="RootDialog">
+                    <Border
+                        x:Name="RootDialog"
+                        Grid.Column="1"
+                        Background="#F9FAFB">
                         <ContentControl Margin="20" Content="{Binding CurrentPage}" />
                     </Border>
                 </Grid>

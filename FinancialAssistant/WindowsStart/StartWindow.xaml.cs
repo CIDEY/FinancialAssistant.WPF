@@ -24,8 +24,15 @@ namespace FinancialAssistant.WindowsStart
         public StartWindow()
         {
             InitializeComponent();
-
             DataContext = new MainViewModel(AppContextSession.CurrentUserId);
+        }
+
+        private void Exit_Btn(object sender, RoutedEventArgs e)
+        {
+            AppContextSession.CurrentUserId = -1;
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
+            this.Close();
         }
     }
 }

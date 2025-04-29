@@ -479,6 +479,24 @@ namespace FinancialAssistant.Services
             };
         }
 
+        public async Task<List<Goal>> GetGoalsAsync(long userId)
+        {
+            return await _context.Goals
+                .Where(g => g.UserId == userId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task DeleteGoalAsync(long goalId)
+        {
+            var goal = await _context.Goals.FindAsync(goalId);
+            if (goal != null)
+            {
+                _context.Goals.Remove(goal);
+                await _context.SaveChangesAsync();
+            }
+        }
+
         // Базовый метод для получения транзакций
         public async Task<List<Models.Transaction>> GetTransactionsByPeriod(
             long userId,

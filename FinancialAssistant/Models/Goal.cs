@@ -11,7 +11,7 @@ namespace FinancialAssistant.Models
         public long Id { get; set; }
         public DateTime CreatedDate { get; set; }
         public double CurrentProgress { get; set; }
-        public string? Deadline { get; set; }
+        public DateTime? Deadline { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; } = null!;
         public double TargetAmount { get; set; }

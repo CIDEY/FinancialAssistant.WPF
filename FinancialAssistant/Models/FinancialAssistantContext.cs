@@ -168,7 +168,7 @@ namespace FinancialAssistant.Models
                       .HasColumnName("createddate");
                 entity.Property(e => e.CurrentProgress).HasColumnName("currentprogress");
                 entity.Property(e => e.Deadline)
-                      .HasMaxLength(255)
+                      .HasColumnType("timestamp without time zone")
                       .HasColumnName("deadline");
                 entity.Property(e => e.Description)
                       .HasMaxLength(255)

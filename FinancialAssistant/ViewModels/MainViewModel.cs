@@ -40,9 +40,10 @@ namespace FinancialAssistant.ViewModels
             {
                 "HomeView" => new HomeViewModel(AppContextSession.CurrentUserId),
                 "TransactionsView" => new TransactionsViewModel(AppContextSession.CurrentUserId),
-                "ReportsView" => new ReportsViewModel(/*_currentUserId*/),
+                //"ReportsView" => new ReportsViewModel(/*_currentUserId*/),
                 "SettingsView" => new SettingsViewModel(/*_currentUserId*/),
                 "AccountsView" => new AccountsViewModel(AppContextSession.CurrentUserId),
+                "GoalsView" => new GoalsViewModel(AppContextSession.CurrentUserId),
                 _ => CurrentPage
             };
         }

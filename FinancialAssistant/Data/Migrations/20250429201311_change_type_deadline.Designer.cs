@@ -3,6 +3,7 @@ using System;
 using FinancialAssistant.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FinancialAssistant.Data.Migrations
 {
     [DbContext(typeof(FinancialAssistantContext))]
-    partial class FinancialAssistantContextModelSnapshot : ModelSnapshot
+    [Migration("20250429201311_change_type_deadline")]
+    partial class change_type_deadline
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,7 +169,7 @@ namespace FinancialAssistant.Data.Migrations
                         .HasColumnName("currentprogress");
 
                     b.Property<DateTime?>("Deadline")
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp(6) without time zone")
                         .HasColumnName("deadline");
 
                     b.Property<string>("Description")
