@@ -24,9 +24,6 @@ namespace FinancialAssistant.ViewModels
         [ObservableProperty]
         private Goal? _selectedGoal;
 
-        //[ObservableProperty]
-        //private decimal _totalBalance;
-
         public GoalsViewModel(long userId)
         {
             _userId = userId;
@@ -41,13 +38,10 @@ namespace FinancialAssistant.ViewModels
             {
                 var goals = await _dbService.GetGoalsAsync(_userId);
                 var summary = await _dbService.GetFinancialSummary(_userId, DateTime.Today);
-                //TotalBalance = summary.TotalBalance;
                 Goals = new ObservableCollection<Goal>(goals);
 
                 for (int i = 0; i < Goals.Count; i++)
-                {
                     Goals[i].CurrentProgress = (double)summary.TotalBalance;
-                }
             }
             catch (Exception ex)
             {
