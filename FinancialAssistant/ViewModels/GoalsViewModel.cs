@@ -46,7 +46,7 @@ namespace FinancialAssistant.ViewModels
 
                 for (int i = 0; i < Goals.Count; i++)
                 {
-                    Goals[0].CurrentProgress = (double)summary.TotalBalance;
+                    Goals[i].CurrentProgress = (double)summary.TotalBalance;
                 }
             }
             catch (Exception ex)
