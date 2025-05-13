@@ -91,7 +91,7 @@ namespace FinancialAssistant.ViewModels
 
             await _dbService.AddTransactionAsync(transaction);
 
-            await ViewModelPopup.LoadTransaction();
+            await ViewModelPopup.LoadTransactions();
             ViewModelPopup.IsAddTransactionPopupOpen = false;
         }
     }

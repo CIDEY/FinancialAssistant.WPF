@@ -19,10 +19,17 @@ namespace FinancialAssistant.ViewModels
     public partial class TransactionsViewModel : ObservableObject
     {
         [ObservableProperty]
-        private bool _isAddTransactionPopupOpen; // Исправлено Transction → Transaction
+        private TransactionType? _selectedFilterType = null;
+
+        public List<TransactionType?> FilterTypes { get; } = new() { null, TransactionType.Income, TransactionType.Expense };
+
+        private ObservableCollection<Transaction> _allTransactions;
 
         [ObservableProperty]
-        private UserControl _addTransactionPopupContent; // Исправлено Transction → Transaction
+        private bool _isAddTransactionPopupOpen; 
+
+        [ObservableProperty]
+        private UserControl _addTransactionPopupContent; 
 
         private readonly DBService _dbService;
         private readonly long _userId;
@@ -34,7 +41,24 @@ namespace FinancialAssistant.ViewModels
         {
             _dbService = new DBService();
             _userId = userId;
-            LoadTransaction();
+            SelectedFilterType = null;
+            LoadTransactions();
+        }
+
+        partial void OnSelectedFilterTypeChanged(TransactionType? value)
+        {
+            ApplyFilter();
+        }
+
+        private void ApplyFilter()
+        {
+            if (_allTransactions == null) return;
+
+            var filtered = SelectedFilterType == null
+                ? _allTransactions
+                : _allTransactions.Where(t => t.Type == SelectedFilterType);
+
+            TransactionList = new ObservableCollection<Transaction>(filtered);
         }
 
         [RelayCommand]
@@ -54,16 +78,27 @@ namespace FinancialAssistant.ViewModels
             IsAddTransactionPopupOpen = true;
         }
 
-        public async Task LoadTransaction()
+        public async Task LoadTransactions()
         {
+            //try
+            //{
+            //    var accounts = await _dbService.GetTransactionsByPeriod(_userId, DateOnly.MinValue, DateOnly.MaxValue);
+            //    TransactionList = new ObservableCollection<Transaction>(accounts);
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show($"Ошибка загрузки транзакций: {ex.Message}");
+            //}
+
             try
             {
-                var accounts = await _dbService.GetTransactionsByPeriod(_userId, DateOnly.MinValue, DateOnly.MaxValue);
-                TransactionList = new ObservableCollection<Transaction>(accounts);
+                var transactions = await _dbService.GetTransactionsByPeriod(_userId, DateOnly.MinValue, DateOnly.MaxValue);
+                _allTransactions = new ObservableCollection<Transaction>(transactions);
+                ApplyFilter(); // Применяем фильтр после загрузки
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки транзакций: {ex.Message}");
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}");
             }
         }
     }

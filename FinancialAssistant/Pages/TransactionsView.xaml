@@ -17,10 +17,11 @@
     <UserControl.Resources>
         <converters:TransactionTypeToBrushConverter x:Key="TransactionTypeToBrushConverter" />
         <converters:TransactionTypeToIconConverter x:Key="TransactionTypeToIconConverter" />
+        <converters:TransactionTypeToStringConverter x:Key="TransactionTypeToStringConverter" />
 
         <Style x:Key="ModernListViewItem" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Padding" Value="0 8" />
+            <Setter Property="Padding" Value="0,8" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -49,16 +50,35 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Заголовок страницы -->
-        <TextBlock
-            Grid.Row="0"
-            Margin="0 0 0 16"
-            FontSize="24"
-            FontWeight="SemiBold"
-            Foreground="#111827"
-            Text="Операции" />
+        <!--  Заголовок и фильтр  -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Список транзакций -->
+            <TextBlock
+                FontSize="24"
+                FontWeight="SemiBold"
+                Foreground="#111827"
+                Text="Операции" />
+
+            <ComboBox
+                Grid.Column="1"
+                Width="150"
+                materialDesign:HintAssist.Hint="Тип операции"
+                ItemsSource="{Binding FilterTypes}"
+                SelectedItem="{Binding SelectedFilterType, Mode=TwoWay}"
+                Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding ., Converter={StaticResource TransactionTypeToStringConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+
+        <!--  Список транзакций  -->
         <Border
             Grid.Row="1"
             Padding="0"
@@ -66,15 +86,15 @@
             CornerRadius="12"
             Effect="{StaticResource MaterialDesignShadowDepth1}">
             <ListView
+                BorderThickness="0"
+                ItemContainerStyle="{StaticResource ModernListViewItem}"
                 ItemsSource="{Binding TransactionList}"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                SelectedItem="{Binding SelectedTransaction}"
-                ItemContainerStyle="{StaticResource ModernListViewItem}"
-                BorderThickness="0">
+                SelectedItem="{Binding SelectedTransaction}">
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border Padding="16 12" Style="{StaticResource HoverEffect}">
+                        <Border Padding="16,12" Style="{StaticResource HoverEffect}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -82,16 +102,16 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Иконка -->
+                                <!--  Иконка  -->
                                 <materialDesign:PackIcon
                                     Grid.Column="0"
                                     Width="24"
                                     Height="24"
-                                    Margin="0 0 16 0"
+                                    Margin="0,0,16,0"
                                     Foreground="{Binding CategoryId, Converter={StaticResource TransactionTypeToBrushConverter}}"
                                     Kind="{Binding CategoryId, Converter={StaticResource TransactionTypeToIconConverter}}" />
 
-                                <!-- Основная информация -->
+                                <!--  Основная информация  -->
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock
                                         FontSize="14"
@@ -99,14 +119,14 @@
                                         Foreground="#111827"
                                         Text="{Binding Category.Name}" />
                                     <TextBlock
-                                        Margin="0 4 0 0"
+                                        Margin="0,4,0,0"
                                         FontSize="12"
                                         Foreground="#6B7280"
                                         Text="{Binding Description}"
                                         TextWrapping="Wrap" />
                                 </StackPanel>
 
-                                <!-- Сумма и дата -->
+                                <!--  Сумма и дата  -->
                                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                     <TextBlock
                                         FontSize="14"
@@ -114,7 +134,7 @@
                                         Foreground="{Binding CategoryId, Converter={StaticResource TransactionTypeToBrushConverter}}"
                                         Text="{Binding Amount, StringFormat={}{0:N2} ₽}" />
                                     <TextBlock
-                                        Margin="0 4 0 0"
+                                        Margin="0,4,0,0"
                                         FontSize="12"
                                         Foreground="#9CA3AF"
                                         Text="{Binding Date, StringFormat={}{0:dd.MM.yy HH:mm}}" />
@@ -124,27 +144,27 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
 
-                
+
             </ListView>
         </Border>
 
-        <!-- Кнопка добавления -->
+        <!--  Кнопка добавления  -->
         <Button
             Grid.Row="2"
-            Margin="0 16 0 0"
+            Height="40"
+            Margin="0,16,0,0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
             Background="#4F46E5"
             Command="{Binding AddTransactionPopupCommand}"
             Cursor="Hand"
             FontSize="14"
-            Foreground="White"
-            Height="40">
+            Foreground="White">
             <StackPanel Orientation="Horizontal">
                 <materialDesign:PackIcon
                     Width="16"
                     Height="16"
-                    Margin="0 0 8 0"
+                    Margin="0,0,8,0"
                     Kind="Plus" />
                 <TextBlock Text="Добавить операцию" />
             </StackPanel>

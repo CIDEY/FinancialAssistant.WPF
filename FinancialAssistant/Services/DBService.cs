@@ -497,7 +497,6 @@ namespace FinancialAssistant.Services
             }
         }
 
-        // Базовый метод для получения транзакций
         public async Task<List<Models.Transaction>> GetTransactionsByPeriod(
             long userId,
             DateOnly startDate,
@@ -506,10 +505,7 @@ namespace FinancialAssistant.Services
             return await _context.Transactions
                 .Include(t => t.Account)
                 .Include(t => t.Category)
-                .Where(t =>
-                    t.Account.UserId == userId &&
-                    t.Date >= startDate &&
-                    t.Date <= endDate)
+                .Where(t => t.Account.UserId == userId)
                 .OrderByDescending(t => t.Date)
                 .AsNoTracking()
                 .ToListAsync();
