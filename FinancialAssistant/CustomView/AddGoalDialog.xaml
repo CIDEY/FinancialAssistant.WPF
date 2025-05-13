@@ -1,0 +1,102 @@
+﻿<UserControl
+    x:Class="FinancialAssistant.CustomView.AddGoalDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:FinancialAssistant.CustomView"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:FinancialAssistant.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:AddGoalDialogViewModel}"
+    d:DesignHeight="500"
+    d:DesignWidth="800"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Grid Margin="20">
+        <StackPanel>
+            <!--  Заголовок  -->
+            <TextBlock
+                Margin="0,0,0,30"
+                FontSize="32"
+                FontWeight="Bold"
+                Foreground="#1F2937"
+                Text="Добавить цель" />
+
+            <!--  Поля ввода  -->
+            <Border
+                Padding="15"
+                Background="White"
+                CornerRadius="10">
+
+                <StackPanel>
+                    <!--  Сумма  -->
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="Название" />
+
+                    <TextBox Margin="0,0,0,10" Text="{Binding GoalName}" />
+
+                    <!--  Сумма  -->
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="Сумма" />
+                    <TextBox Margin="0,0,0,10" Text="{Binding GoalValue}" />
+
+                    <!--  Дата  -->
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="Крайний срок" />
+                    <DatePicker Margin="0,0,0,10" SelectedDate="{Binding DeadLine}" />
+
+                    <!--  Описание  -->
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="Описание" />
+                    <TextBox Margin="0,0,0,10" Text="{Binding DescriptionText}" />
+                </StackPanel>
+            </Border>
+
+            <!--  Кнопки  -->
+            <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                <Button
+                    Margin="0,0,10,0"
+                    Background="#6366F1"
+                    Command="{Binding SaveCommand}"
+                    Content="Добавить"
+                    Foreground="White"
+                    Style="{StaticResource MaterialDesignRaisedButton}">
+                    <Button.Effect>
+                        <DropShadowEffect
+                            BlurRadius="15"
+                            Opacity="0.2"
+                            ShadowDepth="3" />
+                    </Button.Effect>
+                </Button>
+                <!--  Click="CancelButton_Click"  -->
+                <Button
+                    Background="#6366F1"
+                    Command="{Binding CancelCommand}"
+                    Content="Отмена"
+                    Foreground="White"
+                    Style="{StaticResource MaterialDesignRaisedButton}">
+                    <Button.Effect>
+                        <DropShadowEffect
+                            BlurRadius="15"
+                            Opacity="0.2"
+                            ShadowDepth="3" />
+                    </Button.Effect>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+</UserControl>

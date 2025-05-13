@@ -19,11 +19,13 @@ namespace FinancialAssistant.Models
     {
         public FinancialAssistantContext()
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         }
 
         public FinancialAssistantContext(DbContextOptions<FinancialAssistantContext> options)
             : base(options)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         }
 
         public virtual DbSet<Account> Accounts { get; set; }

@@ -1,14 +1,6 @@
-﻿using FinancialAssistant.Models;
+﻿using FinancialAssistant.Classes;
+using FinancialAssistant.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using BCrypt.Net;
-using System.Threading.Tasks;
-using System.Transactions;
-using FinancialAssistant.Classes;
 using Newtonsoft.Json;
 using System.Net.Http;
 
@@ -125,6 +117,12 @@ namespace FinancialAssistant.Services
                 _context.Accounts.Remove(account);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task AddGoalAsync(Goal goal)
+        {
+            await _context.Goals.AddAsync(goal);
+            await _context.SaveChangesAsync();
         }
 
         public async Task AddTransactionAsync(Models.Transaction transaction)

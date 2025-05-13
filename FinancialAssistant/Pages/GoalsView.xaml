@@ -16,6 +16,7 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
+        
         <!--  Добавляем недостающий стиль  -->
         <Style x:Key="MaterialDesignToolBarButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
@@ -164,17 +165,18 @@
             Visibility="{Binding IsGoalPopupOpen, Converter={StaticResource BoolToVisibilityConverter}}" />
 
         <Popup
-            IsOpen="{Binding IsGoalPopupOpen}"
+            IsOpen="{Binding IsGoalPopupOpen, Mode=TwoWay}"
             Placement="Center"
             StaysOpen="False">
             <Border
-                Width="400"
-                Padding="24"
+                Padding="16"
                 Background="White"
                 CornerRadius="8"
                 Effect="{StaticResource MaterialDesignShadowDepth4}">
                 <ContentControl Content="{Binding GoalPopupContent}" />
             </Border>
+
+            
         </Popup>
     </Grid>
 </UserControl>
