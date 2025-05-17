@@ -247,7 +247,7 @@
                                         </StackPanel>
                                     </Button>-->
 
-                                    <Button
+                                    <!--<Button
                                         Command="{Binding NavigateCommand}"
                                         CommandParameter="SettingsView"
                                         Style="{StaticResource NavButton}">
@@ -260,7 +260,7 @@
                                                 Kind="Cog" />
                                             <TextBlock VerticalAlignment="Center" Text="Настройки" />
                                         </StackPanel>
-                                    </Button>
+                                    </Button>-->
 
                                     <Button
                                         Click="Exit_Btn"

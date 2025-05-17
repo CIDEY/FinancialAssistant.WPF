@@ -16,7 +16,7 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        
+
         <!--  Добавляем недостающий стиль  -->
         <Style x:Key="MaterialDesignToolBarButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
@@ -168,6 +168,7 @@
             IsOpen="{Binding IsGoalPopupOpen, Mode=TwoWay}"
             Placement="Center"
             StaysOpen="False">
+
             <Border
                 Padding="16"
                 Background="White"
@@ -176,7 +177,9 @@
                 <ContentControl Content="{Binding GoalPopupContent}" />
             </Border>
 
-            
+
         </Popup>
+
     </Grid>
+
 </UserControl>

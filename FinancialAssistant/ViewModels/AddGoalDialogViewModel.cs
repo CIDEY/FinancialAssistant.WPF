@@ -97,7 +97,7 @@ namespace FinancialAssistant.ViewModels
                 await _dbService.AddGoalAsync(goal);
 
                 await ViewModelPopup.UpdateData();
-                ViewModelPopup.IsGoalPopupOpen = false;
+                    ViewModelPopup.IsGoalPopupOpen = false;
             }
         }
     }
